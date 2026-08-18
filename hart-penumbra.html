@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>gölge ve gerçeğin göstergeleri — mare</title>
+  <style>
+    :root {
+      --ink: #d0d3dc;
+      --paper: #080a12;
+      --foam: #7a829c;
+      --tide: #636b88;
+      --heading: #b0b5c4;
+      --pale: #242838;
+      --mute: #7e8494;
+      --rail: #060810;
+      --rail-line: rgba(126, 132, 148, 0.18);
+      --code-bg: #0a0c16;
+    }
+    html[data-bright="dim"] {
+      --ink: #a8acb8;
+      --paper: #05060c;
+      --heading: #8e93a2;
+      --mute: #686e7c;
+      --rail: #04050a;
+      --code-bg: #060810;
+    }
+    html[data-bright="bright"] {
+      --ink: #e4e6ee;
+      --paper: #121522;
+      --heading: #c4c8d4;
+      --mute: #969aac;
+      --rail: #0e101c;
+      --code-bg: #161828;
+      --rail-line: rgba(150, 154, 172, 0.22);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "IBM Plex Mono", "Consolas", "Courier New", monospace;
+      font-size: 15px;
+      line-height: 1.7;
+      color: var(--ink);
+      background: var(--paper);
+    }
+    .layout {
+      display: grid;
+      grid-template-columns: 13.5rem 1fr;
+      min-height: 100vh;
+    }
+    aside {
+      padding: 1.5rem 1rem 2rem 1.25rem;
+      background: var(--rail);
+      border-right: 1px solid var(--rail-line);
+    }
+    aside .brand {
+      display: block;
+      margin-bottom: 1.25rem;
+      font-size: 0.72rem;
+      color: var(--mute);
+      text-decoration: none;
+      opacity: 0.85;
+    }
+    aside .brand:hover { color: var(--heading); opacity: 1; }
+    aside h2 {
+      margin: 0 0 0.85rem;
+      font-size: 0.68rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--mute);
+    }
+    aside ol {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+    aside li { margin: 0 0 0.7rem; }
+    aside a {
+      color: var(--mute);
+      text-decoration: none;
+      font-size: 0.75rem;
+      line-height: 1.4;
+    }
+    aside a:hover { color: var(--ink); }
+    aside a.here {
+      color: var(--ink);
+      font-weight: 600;
+    }
+    aside time {
+      display: block;
+      font-size: 0.65rem;
+      color: var(--mute);
+      opacity: 0.75;
+    }
+    article {
+      padding: 2rem 3.5rem 4rem 2rem;
+    }
+    .topbar {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 1rem;
+      margin: 0 0 1.5rem;
+    }
+    .crumb {
+      margin: 0;
+      font-size: 0.75rem;
+      color: var(--mute);
+    }
+    .crumb a { color: var(--heading); }
+    .bright-btn {
+      flex-shrink: 0;
+      width: 2.4rem;
+      height: 2.4rem;
+      padding: 0.3rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--mute);
+      background: transparent;
+      border: none;
+      cursor: pointer;
+    }
+    .bright-btn:hover { color: var(--ink); }
+    .bright-btn svg {
+      width: 100%;
+      height: 100%;
+      display: none;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 1.5;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+    html:not([data-bright]) .bright-btn svg[data-level="normal"],
+    html[data-bright="dim"] .bright-btn svg[data-level="dim"],
+    html[data-bright="bright"] .bright-btn svg[data-level="bright"] {
+      display: block;
+    }
+    header h1 {
+      margin: 0 0 0.4rem;
+      font-size: 1.25rem;
+      line-height: 1.35;
+      letter-spacing: 0.02em;
+    }
+    header .meta {
+      margin: 0 0 2rem;
+      font-size: 0.8rem;
+      color: var(--mute);
+    }
+    .body p { margin: 0 0 1.15rem; }
+    .body a { color: var(--heading); }
+    .body pre {
+      margin: 1.25rem 0;
+      padding: 0.9rem 1rem;
+      overflow-x: auto;
+      background: var(--code-bg);
+      border-left: 2px solid var(--rail-line);
+      font-size: 0.84rem;
+    }
+    .body .poem {
+      margin: 1.5rem 0;
+      padding-left: 0.25rem;
+      white-space: pre-wrap;
+      color: var(--mute);
+    }
+    .body blockquote {
+      margin: 1.25rem 0;
+      padding: 0.2rem 0 0.2rem 1rem;
+      border-left: 2px solid var(--rail-line);
+      color: var(--mute);
+    }
+    .body h2 {
+      margin: 2rem 0 0.75rem;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--heading);
+    }
+    .back {
+      margin-top: 2.5rem;
+      font-size: 0.75rem;
+    }
+    .body h3 {
+      margin: 1.4rem 0 0.6rem;
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--heading);
+    }
+    .body .caption {
+      font-size: 0.85rem;
+      font-style: italic;
+      color: var(--mute);
+    }
+    .body sup.fn {
+      font-size: 0.7em;
+      line-height: 0;
+    }
+    .body sup.fn a { color: var(--heading); text-decoration: none; }
+    .body .footnotes {
+      list-style: decimal;
+      margin: 0 0 1.6rem;
+      padding-left: 1.4rem;
+      font-size: 0.82rem;
+      color: var(--mute);
+    }
+    .body .footnotes li { margin: 0 0 0.55rem; }
+    .body .footnotes .backref { color: var(--heading); text-decoration: none; }
+    .body .script {
+      margin: 0.35rem 0 1.25rem;
+    }
+    .body .script img {
+      display: block;
+      width: 50%;
+      max-width: 16rem;
+      height: auto;
+      filter: invert(1);
+    }
+    .body .script figcaption {
+      margin-top: 0.5rem;
+      font-size: 0.85rem;
+      font-style: italic;
+      color: var(--mute);
+      white-space: nowrap;
+    }
+    .body .refs p {
+      padding-left: 1.5em;
+      text-indent: -1.5em;
+    }
+    .back a { color: var(--heading); }
+    @media (max-width: 720px) {
+      .layout { grid-template-columns: 1fr; }
+      aside {
+        border-right: none;
+        border-bottom: 1px solid var(--rail-line);
+      }
+      aside ol {
+        display: grid;
+        gap: 0.35rem;
+      }
+      article { padding: 1.5rem 1.25rem 3rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <aside>
+      <a class="brand" href="blog.html">blog</a>
+      <h2>mare</h2>
+      <ol>
+        <li>
+          <time datetime="2026-08-18">2026-08-18</time>
+          <a class="here" href="hart-penumbra.html">gölge ve gerçeğin göstergeleri</a>
+        </li>
+      </ol>
+    </aside>
+
+    <article>
+      <div class="topbar">
+        <p class="crumb">
+          <a href="blog.html">blog</a> / mare
+        </p>
+        <button type="button" class="bright-btn" id="bright" aria-label="Reading brightness" title="candle / bulb / spotlight">
+          <svg data-level="dim" viewBox="0 0 64 64" aria-hidden="true">
+            <path d="M32 6c0 8-6 10-6 16a6 6 0 0 0 12 0c0-6-6-8-6-16z" fill="rgba(232,192,112,0.35)" stroke="#e8c070"/>
+            <line x1="32" y1="28" x2="32" y2="34" stroke="#d4b07a"/>
+            <rect x="26" y="34" width="12" height="22" rx="1" fill="rgba(154,166,196,0.12)"/>
+            <line x1="24" y1="56" x2="40" y2="56"/>
+          </svg>
+          <svg data-level="normal" viewBox="0 0 64 64" aria-hidden="true">
+            <circle cx="32" cy="26" r="20" fill="rgba(232,192,112,0.06)" stroke="none"/>
+            <circle cx="32" cy="26" r="15" fill="rgba(232,192,112,0.1)" stroke="none"/>
+            <path d="M32 8a14 14 0 0 0-8 26c1.5 2 2 4 2 6h12c0-2 .5-4 2-6a14 14 0 0 0-8-26z"
+              fill="rgba(232,192,112,0.2)" stroke="#d4b07a"/>
+            <path d="M32 16v12M27 22h10" stroke="#d4b07a" opacity="0.85"/>
+            <circle cx="32" cy="24" r="3" fill="#e8c070" stroke="none" opacity="0.75"/>
+            <line x1="28" y1="42" x2="36" y2="42"/>
+            <line x1="28" y1="46" x2="36" y2="46"/>
+            <rect x="27" y="48" width="10" height="6" rx="1"/>
+          </svg>
+          <svg data-level="bright" viewBox="-16 -6 80 70" aria-hidden="true">
+            <g transform="translate(64 0) scale(-1 1)">
+              <line x1="12" y1="52" x2="32" y2="52" stroke="#8a929e"/>
+              <line x1="16" y1="52" x2="16" y2="34" stroke="#8a929e"/>
+              <line x1="28" y1="52" x2="28" y2="34" stroke="#8a929e"/>
+              <path d="M14 24v14h14" stroke="#b8c0cc" fill="none"/>
+              <circle cx="14" cy="22" r="3" fill="none" stroke="#b8c0cc"/>
+              <g transform="rotate(28 30 24)">
+                <path d="M47 15 L78 0 L78 46 Z" fill="rgba(235,240,250,0.12)" stroke="none"/>
+                <path d="M47 17 L72 6 L72 40 Z" fill="rgba(240,245,255,0.22)" stroke="none"/>
+                <path d="M47 19 L66 12 L66 34 Z" fill="rgba(255,255,255,0.38)" stroke="none"/>
+                <rect x="18" y="14" width="28" height="18" rx="3" fill="rgba(180,190,205,0.18)" stroke="#c5ceda"/>
+                <ellipse cx="48" cy="23" rx="5" ry="8" fill="rgba(248,250,255,0.75)" stroke="#eef2fa"/>
+                <ellipse cx="48" cy="23" rx="2.5" ry="4.5" fill="#ffffff" stroke="none"/>
+              </g>
+            </g>
+          </svg>
+        </button>
+      </div>
+      <header>
+        <h1>Gölge ve Gerçeğin Göstergeleri: Hart'ın Penumbra’sına Göstergebilim Üzerinden Bir Eleştiri</h1>
+        <p class="meta">2026-08-18 · mare · egemen · seminer ödevi</p>
+      </header>
+
+      <div class="body">
+        <h2>Giriş</h2>
+        <blockquote>[…] to pluck the mask of Mystery from the face of Jurisprudence.<br><em>Jurisprudence</em>’ın çehresinden Gizem maskesini çekip almak […]</blockquote>
+        <p class="caption">—Jeremy Bentham<sup class="fn"><a href="#fn1" id="fnref1">1</a></sup></p>
+        <p>H.L.A. Hart, hukukta pozitivist doktrini savunduğu “Positivism and the Seperation of Law and Morals” başlıklı makalenin girişinde bir ihtiyaçtan bahseder, bu ihtiyacı Bentham’ın sözleriyle <em>Jurisprudence</em>’ın çehresinden “Gizem maskesini çekip almak” olarak ifade eder.<sup class="fn"><a href="#fn2" id="fnref2">2</a></sup> Bentham’ın Gizem maskesini çekip almaktan kastı 2. George’un hükmünün 4. Yılı yasama işlerinden olan tüm mahkemelerde İngiliz dilinin kullanımını düzenleyen yasadır.<sup class="fn"><a href="#fn3" id="fnref3">3</a></sup> Blackstone <em>Commentaries on the Laws of England</em> adlı eserinde bu yasayı bir işe yaramamış olması ve katiplerin eski kayıtları anlamamasına sebep olması dolayısıyla eleştir.<sup class="fn"><a href="#fn4" id="fnref4">4</a></sup> Bentham, bu yasayı çıkaran yasamacıları “iyiliksever” olarak nitelendirir.<sup class="fn"><a href="#fn5" id="fnref5">5</a></sup> Yargı dili olarak anlaşılmaz ve bilinmez bir Latin dili yerine İngiliz dilinin kullanılmasının arkasında olan Bentham’dan yola çıkarsak görebiliriz ki hukukun anlaşılırlığı ve dilin bağlantısı göz ardı edilemez.</p>
+        <p>Hukukun dile tabi oluşunun doğurduğu bazı sorunlar vardır. Dil toplumun ortaklaşmasına yardımcı olan bir iletişim aracı olarak hukukun da taşıyıcılığını üstlenir ancak bu taşıma görevinin mükemmel bir edasına kabil olmadığı noktalar da mevcuttur. Bu ifa imkansızlığına Hart, makalesinde bir taşıt örneği üzerinden değinir.<sup class="fn"><a href="#fn6" id="fnref6">6</a></sup> Hart’ın taşıt örneği hukuk normlarını ortaya koyan ifade biçimlerinin zaman zaman muğlaklıklar içerebileceğini vurgular. Hart anlamın tartışmalı olduğu bölgelere <em>penumbra</em>; yani yarı gölgeli alan demektedir.<sup class="fn"><a href="#fn7" id="fnref7">7</a></sup> Hart, bu sınıflandırmayla hukukun tartışmasız ve tartışmalı alanları olduğunu göstererek hukukta olan ve olması gereken ayrımıyla ilgili çeşitli çıkarımlarda bulunur. Onun için normlar eksiktir ve birinin doğuracakları sonuçları da gözeterek onların anlamlarına karar verme sorumluluğunu üstlenmesi gerekir.<sup class="fn"><a href="#fn8" id="fnref8">8</a></sup></p>
+        <p>Dünyayı ve dünyayı ifade biçimlerini anlamlandırmak hukukun dışında da bir insan çabasıdır. Saussure’ün 1906 ve 1911 arasında verdiği derslerin bir derlemesi olan <em>Course in General Linguistics </em>kitabında bu çabaya ilişkin gösterge (<em>sign</em>)<em> </em>kavramına değinir.<sup class="fn"><a href="#fn9" id="fnref9">9</a></sup> Saussure sözcükleri, yahut daha geniş bir ifadeyle ses-imgelerini gösteren (<em>signifiant</em>)<em> </em>olarak tanımlar, buna karşın bunların ifade ettiği kavramlar ise gösterilen (<em>signifié</em>)<em> </em>olarak tanımlanır.<sup class="fn"><a href="#fn10" id="fnref10">10</a></sup> Hukuk metinleri de bu göstergeleri kullanarak belirli normları o normlara tabi kişilere bildirmeyi amaçlar. Fuller, her ne kadar bir doğal hukuk perspektifinden baksa da, bir yasayı onu etkileyecek kişiye bildirmemenin yasa yapmada bir başarısızlık olduğunu ortaya koyar.<sup class="fn"><a href="#fn11" id="fnref11">11</a></sup> Yasanın, yasanın tebaasına bildirilmesi yasanın “ahlaki” yönüyle ilişkili olabilirse de, yasanın onun uygulayıcıları tarafından anlaşılması yasanın somut olaya uygulanarak hayat bulması için temel bir şarttır.</p>
+        <p>Hukuk dışı dünyayı anlama ve anlatma çabasını hukuktan ayırmak farklı eleştirilere hedef olabilir. Hukukun hukukçulara özgü bir anlama biçimiyle incelenmesi onu kendisinin özneleri olarak vatandaşlardan ayıracak ve uzaklaştıracaktır; bunun Fuller’in bakışıyla yahut etik kapsamında eleştirisi mümkün olduğu gibi Hart’ın alıntı yaptığı Bentham dahi hukuktan hukuka özgü bir dilin kovulmasını ve yargı işlerinin anlaşılır bir dille yapılmasını desteklemektedir; dilin anlaşılır olması onun yorumlanmasının da özel bir yönteme bağlı olmamasını gerektirir, aksi takdirde ortada garip bir hukuk dilinin varlığından söz edilir, tıpkı yasanın kaldırdığı dil gibi.</p>
+        <p>Hart’ın ortaya attığı yarı gölgeli alan kavramına ilişkin buradaki incelemenin kaynağı gerçekten bu kavramın açıklık bağlamında bir “<em>utility</em>”; bir işe yararlık sunup sunmadığıdır: eldeki makale Hart’ın yarı gölgeli alan kavramını ortaya atmak için kullandığı taşıt örneği üzerinden yarı gölgeli alan kavramını inceleyecek, Saussure ve Barthes’ın göstergebilimde ortaya attığı bazı fikirlerden bahsettikten sonra bunların normların anlamlandırılmasındaki yerini tartışacak, ve son olarak da Hart’ın taşıt örneğini bu kavramlar üzerinden değerlendirerek bu yaklaşımın normların anlamlandırılması bakımından kafi olduğunu ve yarı gölgeli alan ayrımının anlamı netleştirmediğini, bilakis bulanıklaştırdığını ortaya koymaya çalışacaktır.</p>
+        <h2>Somutların İhaneti: Taşıt Örneği</h2>
+        <figure class="script">
+          <img src="assets/magritte-trahison.png" alt="Ceci n'est pas une pipe.">
+          <figcaption>René Magritte, <em>La Trahison des images</em> (1929)</figcaption>
+        </figure>
+        <h3>Giriş</h3>
+        <p>“Positivism and Seperation of Law and Morals” makalesinin üçüncü bölümü hukukta olan ve olması gereken ayrımına realist eleştirilerden bahsederek başlar. Hart bu realist eleştirilerin kattığı perspektifi sergilemek adına kamusal bir parka taşıtların girmesini yasaklayan bir norm örneğini verir.<sup class="fn"><a href="#fn12" id="fnref12">12</a></sup> Hart’ın bu durumda taşıt sözcüğünün anlamını belirlemeye yönelik bir çığlığı vardır: nesneler dile gelip “biz taşıt değiliz” diyemezler.<sup class="fn"><a href="#fn13" id="fnref13">13</a></sup> Haliyle bu bir taşıt değildir deme sorumluluğu yargıcındır.</p>
+        <p>Magritte’in “bu bir pipo değildir” derken kastı farklı görünür; Magritte eserinin yalnız bir temsil aracı olması sebebiyle onu pipo olmaktan hariç tuttuğunu.<sup class="fn"><a href="#fn14" id="fnref14">14</a></sup> Magritte’in hariciyeti Platonvari bir bakış içerir; Platon’un da ifadesiyle, sanatçının eseri yalnız bir görüntüdür.<sup class="fn"><a href="#fn15" id="fnref15">15</a></sup> Hart’ın çıkış noktası ise ilk bakışta bambaşkadır, Hart normu aktaran metindeki her bir sözcüğün belirli birer çekirdek anlamları olduğunu, bu anlamların etrafında anlamın o kadar net olmadığı yarı gölgeli alanların olduğu bir tasavvura sahiptir; dışlama eylemi temsili objeden dışlamaz, objeyi temsilden dışlar. Duruma bu şekilde yaklaşmak bir hata içerir: Hukuk için ilgi konusu normun kendisidir, haliyle obje normdur, somut durumdaki nesne ise onun fiziki dünyadaki bir temsilidir.</p>
+        <p>Yargıcın bu bir taşıt değildir deme sorumluluğu yine Magritte’in ayrımından farklı düşüyor gibi görünür, Magritte tüm temsilleri asıldan ayırırken yargıç bazı temsillerin asılla uyuştuğunu söyler. Magritte’in temsilleri dışlama iddiası ele alındığında bir sorun fark edilir: düşünülsün ki bir heykeltıraş bir pipo heykeli yapmak istesin; tüm detaylara özenen heykeltıraş bir pipoyu temsil ederken bir pipo yaratır— doldurulabilir, tüttürülebilir bir pipo! Öyleyse Magritte için de bazı temsiller asılla uyuşmak zorundadır çünkü heykeltıraşın yaptığı pipoyu bir pipo ustasının yaptığı pipodan ayırmak mümkün değildir.</p>
+        <p>Bu durumda insan tıpkı bir sanatçıdır ve sürekli temsil niteliğinde eserler üretir: insanın davranışlarını düzenleyen hukukun asıllarını dikte ettiği temsiller. Ne var ki hukukun tebaası Magritte gibi dürüstçe eyleminin yahut eylemine konu nesnenin bir pipo yahut bir taşıt olup olmadığını ilan etmez, eylem yahut nesne de Hart’ın yakındığı şekilde bunu ilana kabil değildir, hatta belki bu bilgiden kendisi de yoksundur, hatta Hart’ın iddiası odur ki yargıç da bu bilgiden yoksundur çünkü böyle bir bilgi yoktur, bu bir yarı gölgeli alandır ve yargıç, Austin’in de söylediği gibi -Hart’in iddiasına göre- yarı gölgeli alandaki sorunlarda takdir kullanmalıdır.<sup class="fn"><a href="#fn16" id="fnref16">16</a></sup></p>
+        <p>Yarı gölgeli alan sorunu böylece bir somutların ihanetidir, somutlar olmadıkları gibi görünerek yargıç için bir yarı gölgeli alan oluştururlar. Bu ihanetin pozitivizm bağlamında doğurduklarını anlamak adına bu bölümde Hart’ın taşıt örneği detaylıca incelenerek anlaşılmaya çalışılacak, taşıt örneğinin pozitivizm geleneğindeki yeri değerlendirilecek, ve son olarak taşıt örneğinin gizemle ilişkisi tartışılacaktır.</p>
+        <h2>Taşıt Örneğini Anlamak</h2>
+        <h3>Realizmle İlişki</h3>
+        <p>Hart’ın taşıt örneğini anlamak için ilk adım bu örneğin realist kavrayışın bir örneği olması sebebiyle belki de realistleri anlamak olmalı. Realistlerin kökleri Hart’ın da Fuller’in de deyimiyle kendisini aynı çizgide konumlandırdığı Gray, Holmes gibi yazarlara dayanır.<sup class="fn"><a href="#fn17" id="fnref17">17</a></sup><sup class="fn"><a href="#fn18" id="fnref18">18</a></sup> Tebbit’e göre kimi yazarlar Gray ve Holmes’ü yalnız realizm üzerine etki eden proto-realistler olarak görse de kimi yazarlar onları ilk realistler olarak görmektedir.<sup class="fn"><a href="#fn19" id="fnref19">19</a></sup></p>
+        <p>Realistlerin ilgi noktası yargıçların gerçekten ne yaptığıydı.<sup class="fn"><a href="#fn20" id="fnref20">20</a></sup> Gray için bu hukukun doğasına ilişkin de bir önerme halini alır, Gray’e göre hukuk yargıçların yaptığıdır ve yasalar ve içtihatlar ve bilumum prensip ve kurallar yalnız hukukun kaynağıdır.<sup class="fn"><a href="#fn21" id="fnref21">21</a></sup> Realist görüşün bu kararlara varış sürecinde Hutcheson ile savunduğu bir görüş formalistlerin önerdiğinin aksine yasalardan mantık kurallarıyla sonuca gidildiği düşüncesi yerine önce karar verildiği ve sonra bunun rasyonelize edildiğidir.<sup class="fn"><a href="#fn22" id="fnref22">22</a></sup> Frank bu hukukta mekanikliğe ve formalizme saldırıyı sürdürmüş ve yargısal kararın diğer karar süreçlerinden farklı olmadığını iddia etmiştir, Frank için bu “sonucun baskınlığıdır”.<sup class="fn"><a href="#fn23" id="fnref23">23</a></sup></p>
+        <p>Realist literatürün ilgi konularından bir diğeri kurallara ilişkin şüpheciliktir; çoğu realist kuralların her zaman kullanımda olmadığını ve tüm kararların keyfi olmasa da tahmin edilebilirlikten uzak olduğunu savundu.<sup class="fn"><a href="#fn24" id="fnref24">24</a></sup> Llewellyn sorunun kabul edilmiş kurallarla yargının birbirinden ne kadar farklılaştığı olduğunu söyler.<sup class="fn"><a href="#fn25" id="fnref25">25</a></sup> Frank tüm kuralların bildirici nitelikte olduğunu, kurucu nitelikte olmadığını savunur.<sup class="fn"><a href="#fn26" id="fnref26">26</a></sup> Llewellyn de aynı şekilde kuralların yalnız açıklayıcı olduğunu, ancak bazen mahkemelerin onları takip etmesinin olması gereken olabileceğini söyler.<sup class="fn"><a href="#fn27" id="fnref27">27</a></sup> Llewellyn kâğıt kuralların yetkililere yönelik normatif yargılar olduğunu, yetkililere yetkililerin ne yapması gerektiğini söylediğini ve bunların davranışsal bir incelemede de varlığının inkar edilemeyeceğini söyler.<sup class="fn"><a href="#fn28" id="fnref28">28</a></sup></p>
+        <p>Llewellyn’in 1931 yılında yayınladığı “About Realism—Responding to Dean Pound” makalesi bazı yazarlarca realizmin bir manifestosudur.<sup class="fn"><a href="#fn29" id="fnref29">29</a></sup><sup class="fn"><a href="#fn30" id="fnref30">30</a></sup> Jones, Llewellyn’in kendisinin “A realist Jurisprudence—The Next Step” makalesinin gerçek bir manifesto olduğunu söyleyebileceğini not düşer.<sup class="fn"><a href="#fn31" id="fnref31">31</a></sup> Llewellyn’in ilk makalede ortaya koyduğu dönemin bazı yazarlarının diğer yazarlardan ortak olarak ayrıldığı noktalardır.<sup class="fn"><a href="#fn32" id="fnref32">32</a></sup> Bunlardan özellikle dördüncü, altıncı, yedinci, sekizinci, ve dokuzuncu maddelerin hareket açısından karakteristik olduğunu vurgular.<sup class="fn"><a href="#fn33" id="fnref33">33</a></sup> Bu maddeler ve beşinci madde ana hatlarıyla olan ve olması gerekenin geçici bir ayrımına, geleneksel kuralların mahkemelerin ve insanların gerçekten ne yaptığını ortaya koyduğu iddiasına güvensizliğe, mahkemelerde verilen kararlarda kuralların ağırlıklı faaliyet temeli olduğu iddiasına güvensizliğe, davaların daha dar gruplanması gerektiği inancına, hukukun etkileri bağlamında incelenmesi gerekliliğine, ve bu çizgilerde hukukun sorunlarına sürekli ve pragmatist bir saldırıya değinir.<sup class="fn"><a href="#fn34" id="fnref34">34</a></sup> Bunların bir kısmı “A realist Jurisprudence—The Next Step” makalesinde de gözlemlenebilir, örneğin daha dar inceleme alanlarının gerekliliği.<sup class="fn"><a href="#fn35" id="fnref35">35</a></sup></p>
+        <p>Hart realistleri, özellikle Gray’i yalnız hukuki kaynaklar olduğu görüşü konusunda eleştirir.<sup class="fn"><a href="#fn36" id="fnref36">36</a></sup> Hart burada bir oyunda skor tutan kişiyle bir analoji kurarak skorun skor tutan kişinin dediği olduğu düşüncesinin yanlış olduğunu söyler.<sup class="fn"><a href="#fn37" id="fnref37">37</a></sup> Hart böylece kuralların yalnızca kaynağa indirgenerek yargıcın son kararının hatasız olabileceği düşüncesini reddeder.</p>
+        <p>Hart, olan ve olması gereken ayrımına ilişkin Amerikanlara has eleştirinin en şüphecilerinin realistler olduğunu söyledikten sonra onların eleştirilerini yapıcı bir şekilde kullanarak taşıt örneğini veriyor.<sup class="fn"><a href="#fn38" id="fnref38">38</a></sup> Realistlerin görüşleri ve Hart’ın onlara yönelik eleştirileri dikkate alındığında realistlerin sağladığını söylediği kavrayışla ilişkisi realist yazarların formalist eleştirisine paralellikte yatar. Hart formalizm hatasıyla faydacıların olan ve olması gereken ayrımının nasıl ve hangi ölçüde ilişkili olduğunu sorar.<sup class="fn"><a href="#fn39" id="fnref39">39</a></sup> Buradan Hart’ın iddiasının realist eleştirilerin formalizme yöneltilmesi gerektiği olduğu ve pozitivizmin bu eleştirilerden nispeten arınmış olduğu çıkarılabilir. Öyleyse Hart’ın bu paragrafın girişinde özellikle ortaya koymak istediği öncelikle realistlerin her eleştirisi Hart tarafından benimsenmese de formalizm eleştirilerinin Hart’ın pozitivizmi içerisinde de yer bulabileceğidir. Hart, realistlerin insan dili ve insan anlayışı üzerinde ortaya koydukları temel bir gerçek derken kastettiği de formalizmin eksikliğine ilişkindir: insanın sürekli benzerler ortaya koyması ve kavramlardan anlaşılanları genişletmesi.<sup class="fn"><a href="#fn40" id="fnref40">40</a></sup></p>
+        <h2>Taşıt Örneği</h2>
+        <p>“Bir hukuk kuralı sizi ilgili kamusal parka bir taşıt sokmaktan menediyor”, bu varsayımsal hukuk kuralı Hart’ın taşıt örneğinin başlangıcıdır.<sup class="fn"><a href="#fn41" id="fnref41">41</a></sup> Bu normla ilgili öncelikle bazı hususları tespit etmek gerekir. Öncelikle bu norm tek başına ayakta durmaktadır, bir paragraftan yahut genel bir hukuk sisteminden yoksundur. Hart, normu İngilizce kurgulamıştır, ve ilgi konusu yapacağı sözcük de “vehicle”, yani “taşıt” sözcüğüdür. Sözcüğün özellikle ne olduğunun bir önemi yok, taşıt yerine pipo yahut ekmek veya hesap makinesi denilebilirdi; mühim olan yarı gölgeli alana düşebilecek somutlara hitap eden bir sözcüğün varlığı.</p>
+        <p>Hart, bu kuralın açıkça bir otomobilin parka girmesini yasakladığını söyledikten sonra bisiklet, paten, oyuncak arabaların bu taşıtın kapsamı içerisinde yer alıp almadığını soruyor.<sup class="fn"><a href="#fn42" id="fnref42">42</a></sup> Taşıt sözcüğünü çevreleyen anlamlardan önce, Hart’a göre bir de çekirdek, oturmuş bir anlamın varlığı gerekir.<sup class="fn"><a href="#fn43" id="fnref43">43</a></sup> Hart bu gerekliliği gerekçelendirirken iletişim kuracaksak ve belirli bir tür davranışın düzenlenmesiyle ilgili beyanda bulunacaksak demektedir.<sup class="fn"><a href="#fn44" id="fnref44">44</a></sup> Buna göre iletişimin var olabilmesi ve anlamlı ifadeler için ifadelerin tartışılmaz temelleri olması gerekmektedir. Hart, bu temel anlamların yanında tartışmalı alanlar da olacağını söyleyerek uygulanıp uygulanamayacağı açıkça belirli olmayan anlamlar için yarı gölgeli alan kavramını tanıtıyor.</p>
+        <p>Yarı gölgeli alan fikrini ilk ortaya atan Hart değildir, anlamın bir çekirdeği ve çevresine ilişkin <em>Begriffskern </em>ve <em>Begriffshof </em>kavramları Philipp Heck’in ortaya attığı bir modele ilişkindir.<sup class="fn"><a href="#fn45" id="fnref45">45</a></sup><sup class="fn"><a href="#fn46" id="fnref46">46</a></sup> Bu modele göre anlam çekirdeği bir kavramın net bir şekilde atandığı tüm nesneleri ifade ederken anlam çevresi belirsizleri ifade eder.<sup class="fn"><a href="#fn47" id="fnref47">47</a></sup> Hart’ın taşıt örneğinde taşıt sözcüğünü önemli kılan bu anlayış şeklidir; bazı sözcüklerin bir anlam çekirdeğinin ötesinde imalarının varlığı düşüncesi.</p>
+        <p>Yarı gölgeli alana düşen durumlar her ne kadar standart durumla benzerlikler taşısa da standart durumla tüm özellikleri paylaşmayacaktırlar.<sup class="fn"><a href="#fn48" id="fnref48">48</a></sup> İnsan icadının ve doğal süreçlerin sonucunda sürekli yeni benzerler ortaya çıkar ve bu yeni benzerlerin var olan kurallar kapsamında olup olmadığı söylenirken sınıflandırıcı ona bildirilmemiş bir karara varmak zorundadır çünkü kuralların uygulandığı nesneler ve olaylar dilsiz gibidirler.<sup class="fn"><a href="#fn49" id="fnref49">49</a></sup> Somut durumlardaki olaylar etiketlenmiş ve hukuki sınıflandırmaları üstlerinde yazılı halde yargıcın önüne gelmez.<sup class="fn"><a href="#fn50" id="fnref50">50</a></sup> Öyleyse bir nesnenin taşıt olup olmadığı her zaman malum değildir, Hart istisnai olarak bazı temel anlamların varlığını öne sürmüştür fakat bunun her zaman geçerli olmadığını göstermektedir. Gerçekten de oyuncak araba dile gelip kendisinin bu kuralın uygulanmasına istinaden bir taşıt olarak değerlendirilip değerlendirilemeyeceğini söyleyemez.<sup class="fn"><a href="#fn51" id="fnref51">51</a></sup> Oyuncak arabanın ve patenlerin bu dilsizliği yargıç nezdinde bir sorumluluk doğurur. Bu sorumluluk uygulamadaki sonuçlarını da gözeterek sözcüklerin eldeki durumu kapsayıp kapsamadığı konusunda karar vermektir.<sup class="fn"><a href="#fn52" id="fnref52">52</a></sup></p>
+        <p>Taşıt örneği yargıcın sonuçları gözeterek karar verme sorumluluğunu ortaya koymaya giden bir düşünce deneyidir. Bu düşünce deneyi farklı örneklerle çeşitlendirmek mümkündür, taşıt önemli değildir. Esasında Hart öncelikle bir norm hayal edip ardından bir yargıcın çeşitli durumlarda nasıl karar vereceğini düşünmektedir. Bir otomobil olduğunda herhangi bir sorun doğmaz, zira normun yasakladığı kapsamda olduğu Hart’a göre açıktır fakat taşıt olup olmadığı belli olmayan çeşitli nesneler Hart’ı anlamlandırmada bir yarı gölgeli alan olduğunu düşünmeye iter.</p>
+        <h2>Taşıt Örneğinin Pozitivizmde Yeri</h2>
+        <p>Hart, kendi pozitivist duruşunu samimi gerçekçi bir orta nokta olarak resmeder.<sup class="fn"><a href="#fn53" id="fnref53">53</a></sup> Birçok realist yazarın provokatif sloganlarında olanlardan daha az abartılı mesajlar vermeye çalıştığını söyler ve kendi radikalleriyle aynı düşünmeyen kişilere terapi tavsiye eden Jerome Frank’ı Llewellyn ve Holmes’ten ayırır.<sup class="fn"><a href="#fn54" id="fnref54">54</a></sup> Taşıt örneğinin ortaya koyduğu bazı durumlarda bir yarı gölgeli alan olduğudur, her durumda yargıcın yasa yapması gerekliliği değildir.</p>
+        <p>Hart, realistleri bir uç noktada olmakla eleştirdiği gibi, Dworkin’i de karşı uçta görür ve onu da asil bir hayalin peşinde yargıçların hukuki takdirden yoksun olduğu görüşüne sahip olmak sebebiyle eleştirir.<sup class="fn"><a href="#fn55" id="fnref55">55</a></sup> Hart’ın ifadesiyle Dworkin açık hukuk kuralları yetersiz kaldığında yargıcın hukuk kitaplarını bir kenara iterek kendi ahlaki düşünceleriyle ve sosyal iyi ve adalet anlayışıyla yasa yapması fikrine karşı çıkmaktadır.<sup class="fn"><a href="#fn56" id="fnref56">56</a></sup></p>
+        <p>Hart’ın hem realistlere hem Dworkin’e yönelik eleştirileri temsil ettikleri uç noktalarla ilgilidir. Hart’ın yarı gölgeli alanı bazı durumlar için söz konusudur; Hart ne yargıcın her zaman açıkça hüküm verebileceği fikrini benimser ne de onun tabi olduğu hiçbir hukuk kuralı olmadığı fikrini. Onun yeri formalizmle kural şüpheciliği arasında bir yerdir.<sup class="fn"><a href="#fn57" id="fnref57">57</a></sup> Taşıt örneğinin pozitivizmdeki yeri de bununla ilişkindir: hukukun eksikliği.</p>
+        <h2>Hukukun Eksikliği</h2>
+        <p>Hart İngilizce gibi doğal dillerin yasama için kullanılırken indirgenemez şekilde <em>open-texture </em>özellikte olduğunu söyler.<sup class="fn"><a href="#fn58" id="fnref58">58</a></sup> Hart <em>open-texture </em>özelliğin görüldüğü durumlarda davaların yalnızca “zor davalar” olarak nitelendirilmesini yanlışlar, onun için bunlar yalnızca mantıklı ve bilgili hukukçuların hangi yanıtın hukuki olarak doğru olduğunu tartışacağı davalar değildir; bu durumlarda hukuk eksiktir.<sup class="fn"><a href="#fn59" id="fnref59">59</a></sup> Hart için her zaman hukuk tarafından düzenlenmemiş, her şekilde kararın mümkün olduğu hukukun eksik ve belirsiz olduğu alanlar vardır ve bu onun ve Dworkin’in teorisi arasındaki en sert farktır.<sup class="fn"><a href="#fn60" id="fnref60">60</a></sup></p>
+        <p>Hukukun eksik olduğu durumda Hart’a göre mahkemeler kısıtlı bir yasama fonksiyonu olan “takdir”i kullanmalıdırlar.<sup class="fn"><a href="#fn61" id="fnref61">61</a></sup> Bu görüşe göre yargıç takdir şeklinde yasama yetkisini kullanarak hukuktaki eksikliği kapatacaktır, ancak bunu ancak ve ancak hukukun dilin <em>open-texture </em>yapısı sebebiyle eksik olduğu yerlerde, vakalar sözcüklerin yarı gölgeli alanına düştüğünde yapacaktır. Eğer ki yargıç hukukun eksik olduğu yerlerde, Hart’ın söylediği üzere Bentham’ın dediği gibi yetkisizlik ilan etmeyecekse takdir kullanarak hukuk yaratacaktır.<sup class="fn"><a href="#fn62" id="fnref62">62</a></sup> Hart takdir ile önerdiği hukuk yaratma işlevinin yasamanınkinden farklı olduğunu zira bu yeni hukukun yalnız somut olayla kısıtlı olduğunu ve yargıcın coyasayı yaratırken sınırlara tabi olduğunu belirtir.<sup class="fn"><a href="#fn63" id="fnref63">63</a></sup></p>
+        <p>Hukukun eksik olduğu ve yargıçların yasama yapması gerekliliği Hart öncesinde de pozitivist yazarlarda var olan bir fikirdir. Hart, Austin’in <em>Province of Jurisprudence Determined </em>kitabının sonraki baskılarından birinde Robert Campbell’in eklediği bir kısma atıf yaparak Austin’in gölgeli alanlara düşen durumlarda yargıçların yasama yapmasının zorunlu olduğunu söylediğini aktarır.<sup class="fn"><a href="#fn64" id="fnref64">64</a></sup><sup class="fn"><a href="#fn65" id="fnref65">65</a></sup><sup class="fn"><a href="#fn66" id="fnref66">66</a></sup> Austin bu görüşünde Bentham’ın karşısında durmaktadır. Austin, Bentham’ın yargıçların yasamasını eleştirmek yerine bu yasamayı dar ve ürkekçe ve belirsiz ifadelerle yapmalarını eleştirmesi gerektiğini ifade eder.<sup class="fn"><a href="#fn67" id="fnref67">67</a></sup></p>
+        <p>Austin yasama konusunda Bentham’ın karşısında duruyor olsa da Bentham da hukukun eksik olduğu görüşündedir. Bentham insan eylemlerine dair genel ifadelerle yazılmış hiçbir yasanın yeterli olamayacağını söyler.<sup class="fn"><a href="#fn68" id="fnref68">68</a></sup> Öyleyse hukukun eksik olduğu düşüncesi pozitivizmde yeni değildir. Hart, kendisi de yargıçların hukuku yapmak yerine bulmak düşüncesinin pozitivistlere atfedilebilecek bir günah olmadığını, bunun kökünün Blackstone’da olduğunu söyler.<sup class="fn"><a href="#fn69" id="fnref69">69</a></sup></p>
+        <p>Hart’ın taşıt örneği pozitivizm geleneğinde var olan bir düşüncenin bir düşünce deneyiyle somutlaştırılmasını ifade eder, bu hukukun eksik olduğu düşüncesidir. Hart bu örnekle birlikte hem hukukun eksik olduğunu ortaya koymayı hem de bunu ortaya koyduktan sonra bu düşüncenin önceden beri pozitivizmde var olduğunu göstererek pozitivizmi realist eleştiriden muaf tutmayı amaçlar; Hart için hukuk özellikle eksiktir, yok değildir, yalnız belli somut olaylara uygulanırken yasa koyucunun öngörmediği durumlar yahut dilin genel ifadelerinden kaynaklı gölge alanı sorunları çıkar. Bundan sonraki soru Hart için hukuk eksik olduğunda yargıcın ne yapacağı sorusudur.</p>
+        <h2>Olan ve Olması Gereken</h2>
+        <p>Hukukun eksik olduğu noktalarda bir kararı sağlam kılan hukukun ne olması gerektiğiyle ilişkilidir.<sup class="fn"><a href="#fn70" id="fnref70">70</a></sup> Hukuk yaratan yargıç bunda keyfi davranmamalıdır, kararını meşrulaştıran genel sebepler olmalı ve dürüst bir yasa koyucu gibi davranmalıdır.<sup class="fn"><a href="#fn71" id="fnref71">71</a></sup> Hart’ın dediğine göre eğer ki yarı gölgeli alanlardaki hukuki kararlar rasyonel olacaksa bu rasyonellik önkoşullara dayanan mantıksallıktan başka bir şeyde yatmalıdır.<sup class="fn"><a href="#fn72" id="fnref72">72</a></sup> Taşıt örneği bağlamında bir uçağın bu kural bağlamında taşıt olmadığı argümanı mantıksal olarak kesin olmadan sağlam bir argüman olmalıdır.<sup class="fn"><a href="#fn73" id="fnref73">73</a></sup></p>
+        <p>Hart hukukun eksik olduğu noktalarda nasıl karar verilmesi gerektiğinden bahsederken ikinci bir taşıt örneği verir, bu örnekte çalıntı bir taşıt eyalet sınırlarını geçmemelidir ve bir uçak çalınmıştır; yargıcınsa kuralı somut duruma uygulaması gerekmektedir.<sup class="fn"><a href="#fn74" id="fnref74">74</a></sup> Hart’a göre mantığa atıf yaparak karara varmaya çalışan yargıç; bu kuralın genel terimlerinin farklı yorumlara açık olduğunu ve dilbilimsel gelenekçe kontrol edilmeyen seçimleri olduğunu görmez yahut görmezden gelir, yargı gölgeli alanda olduğunu bilmiyordur veya bunu umursamaz.<sup class="fn"><a href="#fn75" id="fnref75">75</a></sup> Bu durumda yargıç sosyal hedefleri yok sayarak farklı bir yönde karar verir.<sup class="fn"><a href="#fn76" id="fnref76">76</a></sup></p>
+        <p>Sosyal hedefleri yok sayarak bu şekilde verilen kararların Hart yazı-tura atarak karar vermekten farksız olduklarını söyler.<sup class="fn"><a href="#fn77" id="fnref77">77</a></sup> Bu onun gözlemine göre zaten gerçekte olan da değildir. Mekanik olarak damgalanmış birçok yargı kararı aslında sosyal amaçlarla verilir; bu kararlar ya ceza kanunlarında belirtilen ifadeleri sıradan insanın aklında oluşan şekilde algılamak daha adildir gerekçesiyle verilmiştir ki bu da bir sosyal politikadır ya da daha sık olarak yine bir sosyal amaç ışığında verilmiştir karar fakat bu muhafazakâr bir sosyal amaçtır.<sup class="fn"><a href="#fn78" id="fnref78">78</a></sup></p>
+        <p>Kararların olması gerekene dayanarak veriliyor olması hukukta olan ve olması gereken ayrımının bırakılmasına dayanak değildir, Hart için bunun iddiası olması gerekeni ifade eden amaçlar ve politikaların hukukun bir parçası sayılmasına bir davettir.<sup class="fn"><a href="#fn79" id="fnref79">79</a></sup> Hart bu daveti ret için iki sebep sayar; bunlardan ilki hukukun eksik olduğunun iddiasının daha az gizemli olması, ikincisi ise bu ayrımın normlardaki çekirdek anlamın önemini de ortaya koymasıdır.<sup class="fn"><a href="#fn80" id="fnref80">80</a></sup></p>
+        <p>Hart’ın taşıt örneği her ne kadar yargıçların yarı gölgeli alanlarda formalist bir şekilde karar veremeyeceğini ve olması gerekene dayanmaları gerektiğini ortaya koysa da Hart bu gerçeği kabul ederek bunu olan ve olması gereken ayrımını güçlendiren ve bu temel ayrımı realist eleştiriye bir karşı eleştiri haline getiren bir düşünce haline getirir. Taşıt örneği Hart’ın makalenin başlığında da ortaya koyduğu pozitivist geleneğin en temel özelliklerinden olan, olan ve olması gereken ayrımının bir savunmasıdır.</p>
+        <h2>Gölgenin Gizemi</h2>
+        <p>Taşıt örneği ve onu takip eden argümanlarında Hart iki ucun orta noktasında durur. Onun için hukuk ne kapalı ve tamamlanmış bir sistem olarak salt mantığa dayalı çıkarımlarla keşfedilecek bir gerçekten ibarettir ne de yargıcın karar anına kadar bir varlığı olmayan bir kaynaktır. Hukukun temel elementleri vardır ancak bunun dışında eksikleri olduğu da kabul edilir ve yargıçlar bu eksik noktalarda hukuku sosyal amaçlara dayanarak rasyonel bir şekilde çözmelidirler. Hart bunun aksine daveti reddinde sebep olarak hukukun eksikliğini kabul etmenin daha az gizemli olduğunu, yani daha açık olduğunu gösterir. Makalesinin girişinde tekrar ettiği Bentham’ın arzusunun bir uzantısıdır bu, hukukun yüzünden gizem maskesinin çekilip alınması.</p>
+        <p>Fuller, Hart’ın taşıt örneğinin çekirdeğin nasıl tespit edileceği sorusundan temel alan eleştirisini Hart her ne kadar taşıt sözcüğünün bir çekirdek anlamı olduğunu söylese de bunların neler olduğunu saymamaktadır şeklinde ifade eder.<sup class="fn"><a href="#fn81" id="fnref81">81</a></sup> Fuller araçları yasaklayan hukuk kuralının belirli durumlarda uygulanması kolaysa bunun sebebinin normun amacını biliyor olmamız olduğunu söyler. <sup class="fn"><a href="#fn82" id="fnref82">82</a></sup></p>
+        <p>Eleştirisini kuvvetlendirmek adına Fuller, Hart’ın taşıt paragrafına karşı parka bir tören amaçlı bir kamyon sokulması durumunda çalışan bir taşıt olan bu kamyonun çekirdekte sayılıp sayılmayacağını sorar.<sup class="fn"><a href="#fn83" id="fnref83">83</a></sup> Kamyon örneğinden sonra tren istasyonunda uyuyakalan bir kişiye ceza verileceğine dair bir örnek daha verir ve fizyolojik olarak uyuyakalmış bir kişiyle uyuma hazırlığıyla gelmiş bir kişiden hangisine normun uygulanacağını sorar.<sup class="fn"><a href="#fn84" id="fnref84">84</a></sup> Fuller örneklerini devam ettirir ve yarım bırakılmış bir hukuk kuralı vererek burada da sözcüğün bir çekirdek anlamı olup olmadığını sorgulayarak Hart’ı eleştirir.<sup class="fn"><a href="#fn85" id="fnref85">85</a></sup></p>
+        <p>Fuller’in de belirttiği üzere Hart’ın yarı gölgeli alan sorunları birer katalog sorunlarıdır.<sup class="fn"><a href="#fn86" id="fnref86">86</a></sup> Fuller, pozitivist felsefenin yorum yaparken sözcüklerin değil amaç ve yapının merkezdeki ilgi olduğu görüşünün terk edilmesi gerektiğini söylediğini ima eder.<sup class="fn"><a href="#fn87" id="fnref87">87</a></sup> Fuller bu düşüncelerin temelinin dil felsefesiyle ilgili bir yanlışlığa dayandığını ve Wittgenstein, Russell, ve Whitehead’in genel kullanıma karşı duruşlarıyla ve sözcükleri anlamada bağlama bağlılıklarıyla Hart’ın karşısında yer aldığını belirtir.<sup class="fn"><a href="#fn88" id="fnref88">88</a></sup></p>
+        <p>Solum, Wittgenstein’ın teorisini de bahis konusu yaparak anlamsızlık paradoksunun pratik olarak bir anlamı olmadığını iddia eder.<sup class="fn"><a href="#fn89" id="fnref89">89</a></sup> Bu Hart’ın çabasıyla da örtüşür, Hart da hukukun ne olduğuyla ilgilenir ve dolayısıyla onun için önemli olan pratikte ne olduğudur. Tüm eleştirilerin içinde Hart hukukun ne olduğuyla ilgili iki perdeyi indirir, hukuk eksiktir ve yalnız hukukun eksik olduğu yerlerde yargıçlar sosyal amaçlarla hukuk yaratmaktadırlar. Fuller’in eleştirileri için de Hart henüz onları görmeden yarı gölgeli alanla meşgul olmak başka mesele onun dikkati çalması başka meseledir der.<sup class="fn"><a href="#fn90" id="fnref90">90</a></sup></p>
+        <p>Fuller’in Hart’ın bu düşüncesini kafa karıştırıcı bulur zira ona göre eğer ki yarı gölgeli alanla ilgili düşünüyorsak başka yarı gölgeli alan sorunlarını da düşünmek faydalı olacaktır.<sup class="fn"><a href="#fn91" id="fnref91">91</a></sup> Hart’ın bu konudaki duruşunun sebebi olarak onun olanla ilgilenmesi görülebilir. Somut dünyada karşımıza çıkmayan problemleri düşünmek pragmatik bir epistemoloji açısından gereksiz olacaktır. Buna karşın Fuller, Hart’ın örneğinin gerçeği yansıtmadığı düşüncesindedir. Yasa metinlerinin yorumunda dahi sözcüklerin değil cümlelerin, paragrafların yahut sayfa uzunluğunda metinlerin yorumlandığını belirtir.<sup class="fn"><a href="#fn92" id="fnref92">92</a></sup> Fuller bir paragrafın bir standart anlamı olamayacağını öne sürer.<sup class="fn"><a href="#fn93" id="fnref93">93</a></sup> Öyleyse Hart’ın düşüncesi uygulama açısından da sorunlar taşıyabilir.</p>
+        <p>Hart’ın hukukun kısmi eksikliği konusundaki iddiasının yanlışlanması hukukun belirsizliği üzerinde geniş bir tartışma olup hukukun nasıl anlaşıldığına dair sorular da getirecektir. Hukuku tanımlamak Llewellyn’in de dediği üzere hem bir kapsayıcılık hem bir dışlama içerecektir ve dışlama çoğunlukla keyfidir.<sup class="fn"><a href="#fn94" id="fnref94">94</a></sup> Hukuk pratikte görülenden mi ibarettir yoksa çekirdeğin ne olduğuna dair teorik olarak düşünmemiz gerekir mi sorusuna her ne kadar sübjektif bir yanıt vermek mümkün olsa da bunun desteklenmesi bu makalenin kapsamının dışında kalır, hakeza hukukun belirli olup olmadığı sorusuna yanıt verme çabası da.</p>
+        <h2>Doğrudan Anlamlar, Çağrışımlar, ve Mit: Normu Bir Gösterge Olarak Anlamak</h2>
+        <p>Hart’ın “Positivism and the Seperation of Law and Morals” başlıklı makalesi pozitivizmde yargıcın hukuk yaratması ve hukukta ahlakın yeri gibi önemli konulara değinmekle birlikte, bu bahislerde -belki de bir yan etki olarak- dil ve hukukun bağlantısını da göz önüne koyar. Hart, makalenin başında Bentham’ın <em>Jurisprudence</em>’ın çehresinden gizem maskesini çekip almak söylemine ve bunun pozitivizm için önemine değinir, Bentham’ın bu sözde doğrudan kastı hukukta Latince yerine İngiliz dilinin kullanılmasıdır; hakeza makalenin belki de temel örneği olan taşıt örneği de hukuk dilinin anlaşılmasına ilişkin bir düşünce deneyidir.</p>
+        <p>Taşıt örneği ile Hart, hukuk metinlerinin uygulamasında pozitivizmi iki ucun arasına konumlandırmaktadır: Formalistler için mekanik mantık yürütme her durumda bir netlik sağlarken realistler için hukuk her an belirsizdir, Hart her iki görüşün de hatalı olduğu kanısındadır. Taşıt örneğinden Hart’ın çıkarımı odur ki hukuk metinlerinin anlaşılmasında bir yarı gölgeli alan vardır, ve bu alanda hâkim hukuk kuralının kapsamını kendi belirlemek zorundadır, zira bir bisiklet çıkıp ben taşıt değilim diyemeyecektir.<sup class="fn"><a href="#fn95" id="fnref95">95</a></sup></p>
+        <p>Fuller, Hart’ın bu yaklaşımına eleştirilerini “Positivism and Fidelity to Law: A Reply to Professor Hart” başlıklı makalesinde sıralar. Fuller’in eleştirileri arasında dilin bağlamsal oluşu da yatar. Fuller’e göre Wittgenstein, Russell, ve Whitehead gibi dil felsefecileri anlamın bağlama bağlı olduğunu ortaya koyar.<sup class="fn"><a href="#fn96" id="fnref96">96</a></sup> Bununla beraber hukuk metinleri anlaşılırken yalnız sözcüklere bakılmaz, çoğunlukla cümleler, hatta paragraflar incelenir ve bunların “standart” birer anlamı yoktur.<sup class="fn"><a href="#fn97" id="fnref97">97</a></sup></p>
+        <p>Hukuk metinlerinde Barthes ve Saussure geleneğinden gelen göstergebilimin kullanılması bu eleştirinin değindiği sorunları çözme çabasındadır. Saussure ve Barthes’ın <em>sign </em>(gösterge) kavramı aslında taşıt örneğine neredeyse doğrudan uygulanabilir bir kavramdır, bununla birlikte <em>denotation </em>(doğrudan anlam), <em>connotation</em> (çağrışım), ve <em>myth </em>(mit) kavramları da hukuk metinlerinin anlaşılması süreçleri için oldukça kullanışlıdır. Göstergebilim ve hukuk arasında bundan çok daha geniş bir ilişki vardır, <em>International Journal for the Semiotics of Law - Revue internationale de Sémiotique juridique </em>dergisi 1988 yılından beri bu iki alanın kesişim alanında inceleme yapan makalelere ev sahipliği yapmaktadır. Bu makalenin kapsamı buna kıyasla çok daha dar olarak yalnızca hukuk metinlerinin temel göstergebilim kavramları kullanılarak anlaşılmasını kapsar.</p>
+        <p>Bu bölümde öncelikle Saussure ve Barthes’ın ortaya attığı ilgili göstergebilim kavramlarına değinilecek, bu kavramların hukuk metinlerinin anlaşılmasında nasıl bir kullanımı olabileceğinden bahsedilecek, ve ardından bu kavramlar kullanılarak Hart’ın taşıt örneği incelenerek yarı gölgeli alan sorununun sözcükler gösterge olarak değerlendirildiğinde de bir sorun olarak varlığını sürdürüp sürdürmediği değerlendirilecektir.</p>
+        <h2>Gösterge Kavramı</h2>
+        <p>Gösterge kavramı <em>Course in General Linguistics </em>kitabında açıklanmaktadır. Burada, Saussure, gösterge kavramını iki parçanın birleşimi olarak koyar: <em>sound-image </em>(ses-imajı), ve <em>concept </em>(kavram).<sup class="fn"><a href="#fn98" id="fnref98">98</a></sup> Saussure’e göre linguistik gösterge bir şey ve adını birleştirmez, bir kavram ve bir ses-imajını birleştirir.<sup class="fn"><a href="#fn99" id="fnref99">99</a></sup> Ses-imajı da kavram da birbirini çağırır.<sup class="fn"><a href="#fn100" id="fnref100">100</a></sup> Saussure burada yeni bir kavramsallaştırmaya giderek kavrama <em>signifié </em>(gösterilen) ve ses-imajına <em>signifiant </em>(gösteren) demeyi tercih eder.<sup class="fn"><a href="#fn101" id="fnref101">101</a></sup></p>
+        <p>Göstergenin ne olduğu nispeten basit olsa da göstergenin anlam ifadelerinde girebileceği ilişkiler karmaşıklaşır. Barthes’ın doğrudan anlam ve çağrışım kavramları burada devreye girer. Barthes gösterim düzlemi (E) ve içerik (C) düzleminin bir ilişkiyle (R) birbirine bağlı olduğunu belirtir.<sup class="fn"><a href="#fn102" id="fnref102">102</a></sup> Bundan sonra bu E R C sisteminin kendisinin bir ikinci sisteme eleman olduğu bir düzen hayal eder<sup class="fn"><a href="#fn103" id="fnref103">103</a></sup> Bunun olmasının ilk yolu ilk sistemin ikinci sistemin gösterileni olmasıdır.<sup class="fn"><a href="#fn104" id="fnref104">104</a></sup>  Barthes’ın da aktardığı üzere bu Hjelmslev’in <em>connotative semiotics </em>(çağrışımsal göstergebilim) dediği durumdur. <sup class="fn"><a href="#fn105" id="fnref105">105</a></sup> <sup class="fn"><a href="#fn106" id="fnref106">106</a></sup></p>
+        <p>Çağrışımlı sistemler için Barthes, yaygın durumun dilin ilk sistemi oluşturduğu durumlar olduğunu söyler ve edebiyatı da örnek olarak gösterir.<sup class="fn"><a href="#fn107" id="fnref107">107</a></sup> Aynı zamanda bu çağrışımlı sistemlerde çağrışımın gösteren ögesi yalnız tek bir doğrudan anlamlı göstergeden oluşmak zorunda değildir, doğrudan anlamlı göstergeler bir araya gelerek çağrışımlı sistem içerisinde tek bir gösterge edeni oluşturabilirler; yani doğrudan anlamlı bir söylemin büyük parçaları çağrışımlı bir sistemde tek bir birim olabilir, buna çok fazla sayıda sözcükten müteşekkil olan ama yine de tek bir gösterileni ifade eden metnin tonu örnek olarak verilebilir. <sup class="fn"><a href="#fn108" id="fnref108">108</a></sup></p>
+        <p>Göstergesel sistemlere ilişkin düşünceyi Barthes bir adım daha öteye taşıyarak ikinci derece bir sistem olarak <em>myth</em>’i<em> </em>(mit) ortaya koyar. Mit bir mesajdır, bir iletişim sistemidir.<sup class="fn"><a href="#fn109" id="fnref109">109</a></sup> Bununla beraber, mit ikinci derece bir göstergebilimsel sistemdir, kendinden önceki göstergebilimsel bir zincir üzerine kurulmuştur.<sup class="fn"><a href="#fn110" id="fnref110">110</a></sup> Çağrışımsal sistemde olduğu gibi ilk sistemde bir gösterge olan, ikinci sistemde yalnızca bir gösteren olur.<sup class="fn"><a href="#fn111" id="fnref111">111</a></sup></p>
+        <p>Barthes miti açıklamak için iki örneğe başvurur.<sup class="fn"><a href="#fn112" id="fnref112">112</a></sup> Bu örneklerden ilkinde Barthes kendisini bir Fransız lise öğrencisi olarak hayal eder ve Latince kitabında “adım aslan olduğu için” mealinde bir cümle görür.<sup class="fn"><a href="#fn113" id="fnref113">113</a></sup> Barthes bu cümlenin anlamının önemli olmadığını, zira cümlenin kendi anlamını göstermek için orda olmadığını, ona yüklemle ilgili bir örnek teşkil etme amacını taşıdığını söyler.<sup class="fn"><a href="#fn114" id="fnref114">114</a></sup> Böylece ilk göstergebilimsel sistem dil olur, onun gösterileni cümlenin anlamı iken ikinci sistemde gösterilen gramer kuralıdır.<sup class="fn"><a href="#fn115" id="fnref115">115</a></sup> İkinci örnekte ise Barthes bir berberde olduğunu ve bir dergi kapağında Fransız bayramını selamlayan bir siyahi gördüğünü hayal eder.<sup class="fn"><a href="#fn116" id="fnref116">116</a></sup> Onun için bu yalnızca resmin anlamıdır, ilk gösterilendir, ikinci gösterilen ise Fransızlık ve militarizmdir.<sup class="fn"><a href="#fn117" id="fnref117">117</a></sup></p>
+        <h2>Göstergebilim ve Hukuk Metinlerinin Anlaşılması</h2>
+        <p>Barthes’ın bahsettiği çağrışımsal göstergebilim sistemleri ve mitler Fuller’in Hart’a yönelik eleştirisi bakımından da anlamlıdır. Fuller hukuk metinlerinin bağlamsal olarak incelenmesi ve yalnızca tekil sözcüklerin değil çoğunlukla paragrafların anlaşılmaya çalışıldığını söyleyerek Hart’ın sözcüklerin anlamlarının zaman zaman yarı gölgeli alanda kaldıklarına ilişkin iddiasına karşı çıkmıştı. Hukuk metinleri de dilden müteşekkildir, öyleyse onlar da ilk aşamada dilsel göstergebilim sistemleri oluştururlar.</p>
+        <p>Herhangi bir hukuk metnini bu şekilde incelerken: (i) sözcükler gösterenler olarak birleşir ve tek bir gösterilen olarak metnin anlamını işaret eder (ii) metnin anlamı bir gösteren olarak “norm”u işaret eder. Norm yalnızca bir hukuk metninin anlamı olmaktan öte bir davranış biçimi dikte eden bir önerme olarak vücut bulur. Tıpkı “adım aslan olduğu için” cümlesinin anlamının önemi olmaması, bilakis onun gösterdiği gramer kuralının asıl gösterilen olması gibi hukuk metni de metin anlamı olarak önem teşkil etmez, o ve onun ilişkili olduğu diğer metinler bir davranış şekline işaret ederek bir normu gösterirler.</p>
+        <p>Hart’ın yarı gölgeli alanı sözcüklerin anlamına ilişkin bir çekirdek anlamlar setini kabul etmekle birlikte bir de bu anlamların uygulamasının açıkça uygun olup olmadığı durumları kavramsallaştırır.<sup class="fn"><a href="#fn118" id="fnref118">118</a></sup> Göstegebilimsel olarak ise buna gerek yoktur, zira hukuk metnindeki sözcüklerin düz anlamları göstergebilimsel zincirde yer alsalar da gösterilen yalnızca bir düz anlamdan beslenmez, birden fazla göstergenin birden fazla düz anlamı tek bir gösterilen olarak hukuk normuna götürür. Bu da, nasıl ki Hart’ın yarı gölgeli alanı bir cisme ışık tutulduğunda onun düşen gölgesiyle ışığın arasında kalan gölge ve ışığın birbirine geçtiği alandan esinleniyorsa bir cisme birden fazla ışık tutulduğu bir duruma benzer: bir yarı gölge yoktur zira her gösteren anlamı netleştirmek adına yardımcıdır, aydınlık ve karanlık bellidir.</p>
+        <h2>Hart’ın Taşıt Örneğinin İncelenmesi</h2>
+        <p>Hart’ın “Positivism and the Seperation of Law and Morals” makalesinin çekirdeğinde taşıt örneği olarak anılabilecek bir düşünce deneyi vardır. Bu örnek kısaca bir hukuk kuralının bir kamusal parka “taşıt”ların girmesini yasakladığı bir senaryodan bahseder.<sup class="fn"><a href="#fn119" id="fnref119">119</a></sup> Hart bunun devamında bunun açıkça bir “otomobil”i yasakladığını söyler ve bunun bisiklet, kaykay, oyuncak arabalar gibi taşıtları da kapsayıp kapsamayacağını.<sup class="fn"><a href="#fn120" id="fnref120">120</a></sup></p>
+        <p>Taşıt örneğine göstergebilim uygulanırken öncelikle “taşıt”ın ne olduğu tespit edilmelidir. Taşıt, saussureyan bir yaklaşımla bir ses-imajıdır. Bu ses-imajının göstergebilimsel karşılığı ise gösterendir. Hart için sorun bu gösterenin gösterileninin ne olduğu değildir, onun için de bu gösterenin birden fazla gösterileni vardır. Sorun bu gösterilenlerden hangisinin normun kapsamında olduğudur. Öyleyse ikinci derece gösterge olan normun tespiti asıl meseleyi teşkil eder.</p>
+        <p>Burada Fuller’in eleştirilerini tekrar hatırlamakta yarar vardır. Fuller, Hart’a karşılık kuralın bazı durumlarda uygulanması kolay geliyorsa bunun sebebinin normun genel olarak neyi amaçladığını bilmemizdir der.<sup class="fn"><a href="#fn121" id="fnref121">121</a></sup> Bazı durumlarda kuralın amacının ne olduğunu sormadan kuralı uygulayabiliyorsak bunun sebebi Fuller’e göre, misal, kuralın niyetinin parkta sessizlik sağlamak olduğunu bilmemiz ve böylece gürültülü bir otomobili kuraldan dışlamamızdır.</p>
+        <p>Fuller aynı zamanda Hart’ın teorisini yorum sorunlarının genellikle tekil sözcüklerin anlamından doğduğunu varsayması sebebiyle.<sup class="fn"><a href="#fn122" id="fnref122">122</a></sup> Gerçekten de parka taşıt girmesini yasaklayan kuralın bir gösterge olarak kapsamını saptayabilmek için o kanunun bağlamı da önemlidir. Bu durumda kuralın bulunduğu kanunun sistematik olarak ilişkili olduğu diğer kurallar, ve hatta kanunun amacı da önemlidir.</p>
+        <p>Barthes fotoğrafların ve objelerin bile bir anlamları varsa bir tür konuşma olabileceğini söyler.<sup class="fn"><a href="#fn123" id="fnref123">123</a></sup> Öyleyse kanunu kanun yapan şartlar da norm göstergesi için gösterenler olabilirler. Haliyle Fuller’in de dediği gibi normun kapsamı belirlenirken taşıt dışındaki etmenlerin de değerlendirilmesi gerekir, zira norm bir gösterge olarak “taşıt”ın göstereni olduğu gösterge ve sair göstergelerin gösterilenleriyle birlikte vücut bulur. Örneğin, Fuller’in örneğindeki gibi, parka taşıt girmesinin yasak olduğu kuralında park göstergesi ikinci derece göstergebilimsel bir sistemde insanlara sükuneti çağrıştırır, ve böylece norm bir gösterge olarak parka gürültülü araçların girmesinin yasağı olarak meydana gelir. Hatta bir mit sistemi olarak norm devletin yaptırım mekanizmalarını ve iktidarını da kapsar, onu zorlayıcı ve uyulur kılan özelliği de böylece onun anlamıyla iç içedir.</p>
+        <h2>Sonuç</h2>
+        <p>Saussure ve Barthes’ın ortaya atmış olduğu doğrudan anlam, çağrışım, ve mit kavramları Hart’ın değindiği sorunun belki de en başından bir sorun olmadığını gösterebilir. Hart’ın niyeti kendisinin de bahsettiği üzere gerçekten <em>jurisprudence</em>’ın çehresinden Gizem maskesini çekip almak olabilir, buna karşın eyleminin niyetine uygunluğu tartışmaya açıktır. Bentham, Hart’ın bu niyetiyle ilgili konuşurken kastı yargı dilinin anlaşılır kılınmasıydı, Hart ise yargı dilinin anlaşılır kılınması adına yargı dilinin bazı anlaşılması mümkün olmayan belirsizlikler içerdiğini iddia etmiştir. Hart’ın tezi kendi içerisinde tutarlı görünür, taşıt örneği kapsamında gerçekten de taşıt sözcüğünün neleri ifade ettiğini anlamak mümkün değildir.</p>
+        <p>Taşıt sözcüğünün kapsamına dair bir çıkarım her ne kadar yalnız taşıt sözcüğünün değerlendirilmesiyle mümkün olmasa da Fuller’in eleştirisinin de kısmen ortaya koyduğu gibi taşıt sözcüğünden fazlasına bakılarak mümkün olabilir. Fuller bunu yorum sorunun sözcüğe indirgenmesini hatalı bularak ifade etmiş ve pratikte paragrafların incelendiğini ve kuralın amacını sormadığımızda dahi bunu bildiğimizi söylemiştir. Hukuk kuralının metninin içerisinde “gizli” bir anlam olduğunu söylemek Hart’ın baştaki amacından uzaklaşmak olur, eğer gizli bir anlam varsa hukukun yüzündeki gizem maskesi varlığını sürdürür, Hart bundan “yargıçların keşfetmesi için sosyal politikaların orda olduğunu söylemek” şeklinde bahsetmiştir.<sup class="fn"><a href="#fn124" id="fnref124">124</a></sup></p>
+        <p>Hart’ın düşüncesinde hukuk eksiktir.<sup class="fn"><a href="#fn125" id="fnref125">125</a></sup>Buna karşın Saussure ve Barthes’ın göstergebilimsel yaklaşımı uygulandığında eksik olan hukuk değil, hukuk metinleri haline gelir. Hukuk metinleri gerçekten de Hart’ın dediği gibi hukuk normunu tayin etmede yetersizdir. Bunun göstergebilimsel olarak karşılığı hukuk metninin bir göstergeden gösterene dönüştüğünde tek başına normun gösterilen olduğu bir çağrışımsal sistem yahut mit sistemi oluşturmamasıdır. Yine Hart’ın dediği gibi hukuk metninde yargıcın keşfetmesi için bekleyen gizli bir amaç yoktur, amaçlar farklı göstergeler olarak farklı yerlerde yer alır; zaman zaman farklı hukuk metinlerinde, zaman zaman kültürel ögeler olarak, zaman zaman fiziksel nesneler olarak.</p>
+        <p>Göstergebilimin hukukta kullanılmasındaki ayrıntı, göstergebilimin bir hukuk kuralı yorumlama yöntemi iddiası olmamasıdır. Saussure’ün göstergebilimsel incelemeyle çabaladığı hayatın her yerinde bulunan göstergelerdi, ve özellikle de dil. Bununla beraber Hjemslev’in de dediği üzere dil insandan ayrılmaz ve onu her yere takip eder.<sup class="fn"><a href="#fn126" id="fnref126">126</a></sup> Barthes’ın mite yönelik incelemesi de sınırlayıcı olmaktan çok uzaktır, haliyle hukuk da dil ve toplumla ilişkisi sebebiyle bu tür bir incelemeye dahil olmaktan kaçamamaktadır. Saussure’ün ses-imajı ve kavramı özellikle konuşmadaki anlamlandırma süreçlerini inceler, ses-imajı için yalnızca psikolojik bir yansıma der.<sup class="fn"><a href="#fn127" id="fnref127">127</a></sup> Saussure “hukuku böyle incelemeliyiz” demek bir yana, “dili böyle incelemeliyiz” dahi dememektedir, onun bakışıyla dil ve anlamlandırma süreçleri zaten böyle işler. Haliyle hukuk metinlerinin anlamlandırılması ve normun ortaya çıkartılması sürecine de Saussure’ün uygulanması normatif bir tavsiye değil, pozitif durumun ortaya çıkarılma iddiasını taşır.</p>
+        <p>Göstergebilimin hukuk metinlerinin anlamlandırılma sürecine dair iddiası bir yana, Hart’ın kendi teorisinin kendi içerisindeki eksikleri de ortadadır. Fuller’in eleştirilerinin bu bakımdan belki de en önemli özelliği Hart’a yönelik “bu düşünceler yanlış” iddiasında olmanın ötesinde Hart’ın teorisindeki iç tutarsızlıkları ortaya koymalarıdır. Gerçekten de bir hukuk metni incelenirken yalnızca bir sözcüğe bakılmaz, gerçekten de Hart’ın şiddetle reddettiği şekilde yasanın içinde gizli bir amaç yargıçların keşfetmesi için orda değilse bile hukuk normunun uygulanmasında yasa koyucunun amaçları önem taşır; bu hukuk eksik değil demek değildir. Hart’ın da iddiası üzere hukukun eksik olduğu noktalar da elbet olacaktır, fakat bunlar sözcüklerin kimin belirleyeceği belirsiz olan çekirdek anlamlarının etrafındaki yarı gölgeli alanlar olamaz, zira bu düşünce şekli gizem maskesini hukukun gizli amacından hukukun gizli çekirdek anlamına taşımak dışında bir işe yaramamaktadır.</p>
+        <p>Hukuk normunun keşfi sürecinde belirsizlikler olması doğaldır, insanlar -henüz- birbirlerinin zihinlerini okumaktan acizdirler. Saussure gösterenin temsil ettiği fikre göre özgürce seçilmiş görünmesine rağmen onu kullanan linguistik toplulukla sabitlenmiş olduğunu söyler.<sup class="fn"><a href="#fn128" id="fnref128">128</a></sup> Öyleyse dil kullanarak iletişimde ortak anlamlara ulaşmak için aynı linguistik topluluğa dahil olmak bir şart, benzer şekilde tüm göstergebilimsel sistemlerde ortak bir anlamlar sistemine dahil olmak gerek; anlam böylece toplumsal bir niteliği haizdir. Öyleyse hukuk normunun ortaya çıkarılmasında yargıcın görevi toplumla iki kez ilişkilidir: öncelikle metni keşfederken, dilsel olarak; ve sonrasında normu kişilere uygulanacak bir norm olarak ortaya koyarken.</p>
+        <h2>Dipnotlar</h2>
+        <ol class="footnotes">
+        <li id="fn1">Jeremy BENTHAM, <em>A Fragment on Government</em> (Düzenleyen: F.C. Montague), Clarendon Press, Oxford, 1891, s.113. <a class="backref" href="#fnref1">↩</a></li>
+        <li id="fn2">H.L.A. HART, “Positivism and the Seperation of Law and Morals,” in <em>Harvard Law Review</em>, Vol. 71, No.4, Feb 1958, s. 594. DOI: https://doi.org/10.2307/1338225 URL: https://www.jstor.org/stable/1338225 <a class="backref" href="#fnref2">↩</a></li>
+        <li id="fn3">Danby PICKERING<em>, The Statutes at Large: From the Second to the 9th Year of King George II.</em>, Joseph Bentham, Cambridge, 1765, s. 248. <a class="backref" href="#fnref3">↩</a></li>
+        <li id="fn4">William BLACKSTONE, <em>Commentaries on the Laws of England.</em>, Childs and Peterson, Philadelphia, 1860. <a class="backref" href="#fnref4">↩</a></li>
+        <li id="fn5">BENTHAM, 1891, s. 113. <a class="backref" href="#fnref5">↩</a></li>
+        <li id="fn6">HART, 1958, s. 607. <a class="backref" href="#fnref6">↩</a></li>
+        <li id="fn7">HART, 1958,  s. 607. <a class="backref" href="#fnref7">↩</a></li>
+        <li id="fn8">HART, 1958, s. 607. <a class="backref" href="#fnref8">↩</a></li>
+        <li id="fn9">Ferdinand de SAUSSURE, <em>Course in general linguistics</em>, The Philosophıcal Library Inc,, New York, 1959, s. 66. <a class="backref" href="#fnref9">↩</a></li>
+        <li id="fn10">SAUSSURE, s. 67. <a class="backref" href="#fnref10">↩</a></li>
+        <li id="fn11">Lon L FULLER, <em>The Morality of Law</em>, revised edition, Yale University Press, New Haven and London, 1969, s.39. <a class="backref" href="#fnref11">↩</a></li>
+        <li id="fn12">HART, 1958, s. 607. <a class="backref" href="#fnref12">↩</a></li>
+        <li id="fn13">HART, 1958, s. 607. <a class="backref" href="#fnref13">↩</a></li>
+        <li id="fn14">Brigitt HAUSER-SCHÄUBLİN, “Changing Contexts, Shifting Meanings: The Cook/Forster Collection, For Example.” <em>Changing Contexts, Shifting Meanings: Transformation of Cultural Traditon in Ocenia</em> içinde (Derleyen: Elfriede Hermann), University of Hawaii Press, 2011, s. 21. <a class="backref" href="#fnref14">↩</a></li>
+        <li id="fn15">PLATO, <em>Republic Boox X, </em>596e. <a class="backref" href="#fnref15">↩</a></li>
+        <li id="fn16">HART, 1958, s. 609. <a class="backref" href="#fnref16">↩</a></li>
+        <li id="fn17">Lon L. FULLER, “Positivism and Fidelity to Law: A Reply to Professor Hart,” in <em>Harvard Law Review</em>, Vol. 71, No.4, Şub, 1958, s. 669. DOI: https://doi.org/10.2307/1338226 URL: https://www.jstor.org/stable/1338226 <a class="backref" href="#fnref17">↩</a></li>
+        <li id="fn18">Mark TEBIT, Philosophy of Law: An Introduction, Third Edition, Routledge, 2017, s. 61 <a class="backref" href="#fnref18">↩</a></li>
+        <li id="fn19">TEBBIT, s. 62. <a class="backref" href="#fnref19">↩</a></li>
+        <li id="fn20">TEBBIT, s. 63. <a class="backref" href="#fnref20">↩</a></li>
+        <li id="fn21">TEBBIT, s. 63. <a class="backref" href="#fnref21">↩</a></li>
+        <li id="fn22">TEBBIT, s. 69. <a class="backref" href="#fnref22">↩</a></li>
+        <li id="fn23">TEBBIT, s. 70. <a class="backref" href="#fnref23">↩</a></li>
+        <li id="fn24">TEBBIT, s. 73. <a class="backref" href="#fnref24">↩</a></li>
+        <li id="fn25">Karl N. LLEWELLYN, “A Realistic Jurisprudence — The Next Step,” Columbia Law Review, vol. 30, no. 4, Nis. 1930, s. 444. <a class="backref" href="#fnref25">↩</a></li>
+        <li id="fn26">TEBBIT, s. 74. <a class="backref" href="#fnref26">↩</a></li>
+        <li id="fn27">LLEWELLYN, 1930, s. 448. <a class="backref" href="#fnref27">↩</a></li>
+        <li id="fn28">LLEWELLYN, 1930, s. 449. <a class="backref" href="#fnref28">↩</a></li>
+        <li id="fn29">TEBBIT, s. 73. <a class="backref" href="#fnref29">↩</a></li>
+        <li id="fn30">Harry W. JONES, “Law and Morality in the Perspective of Legal Realism,” Columbia Law Review, vol. 61, no. 5, May 1961, s. 799. <a class="backref" href="#fnref30">↩</a></li>
+        <li id="fn31">JONES, s. 799n1. <a class="backref" href="#fnref31">↩</a></li>
+        <li id="fn32">Karl N. LLEWELLYN, “Some Realism about Realism: Responding to Dean Pound,” Harvard Law Review, vol. 44, no. 7, Haz. 1931, s. 1235. <a class="backref" href="#fnref32">↩</a></li>
+        <li id="fn33">LLEWELLYN, 1931, s. 1238. <a class="backref" href="#fnref33">↩</a></li>
+        <li id="fn34">LLEWELLYN, 1931, ss. 1236-1238. <a class="backref" href="#fnref34">↩</a></li>
+        <li id="fn35">LLEWELLYN, 1930, s. 457. <a class="backref" href="#fnref35">↩</a></li>
+        <li id="fn36">TEBBIT, s. 76. <a class="backref" href="#fnref36">↩</a></li>
+        <li id="fn37">H.L.A. HART, Concept of Law, Second Edition, Oxford University Press, 1994, s. 142. <a class="backref" href="#fnref37">↩</a></li>
+        <li id="fn38">HART, 1958, ss. 606-607. <a class="backref" href="#fnref38">↩</a></li>
+        <li id="fn39">HART, 1958, s. 608. <a class="backref" href="#fnref39">↩</a></li>
+        <li id="fn40">HART, 1958, s. 607. <a class="backref" href="#fnref40">↩</a></li>
+        <li id="fn41">HART, 1958, s. 607. <a class="backref" href="#fnref41">↩</a></li>
+        <li id="fn42">HART, 1958, s. 607. <a class="backref" href="#fnref42">↩</a></li>
+        <li id="fn43">HART, 1958, s. 607. <a class="backref" href="#fnref43">↩</a></li>
+        <li id="fn44">HART, 1958, s. 607. <a class="backref" href="#fnref44">↩</a></li>
+        <li id="fn45">Doris LIEBWALD, “Law’s Capacity for Vagueness<em>,” International Journal for the Semiotics of Law</em>, vol. 26, no. 2, 2012, s. 402. doi: 10.1007/s11196-012-9288-3 <a class="backref" href="#fnref45">↩</a></li>
+        <li id="fn46">İroniktir ki Heck’in 1905’te Deutsche Juristen-Zeitung’da yayınlanmış, Fuller’in Hart’a yanıt makalesiyle “Yasaya Sadakat” başlığını (Dr. Altan Heper’in “Yasaya Sadakatin Farklı Bir Okuması” başlıklı makalesinde yer aldığı şekliyle; aksi halde yasaya itaat gibi çeviriler de mümkün) paylaşan bir yazısı mevcuttur. (s.1139-1140) Dr. Heper’in makalesi: https://dergipark.org.tr/tr/download/article-file/97878 Sayının tamamı: https://dlc.mpdl.mpg.de/dlc/view/escidoc:88576:2/recto-verso Heck’in yazısı: http://dlib-zs.mpier.mpg.de/pdf/2173669/10/1905/21736691019050610.pdf <a class="backref" href="#fnref46">↩</a></li>
+        <li id="fn47">LIEBWALD, s. 402. <a class="backref" href="#fnref47">↩</a></li>
+        <li id="fn48">HART, 1958, s. 607. <a class="backref" href="#fnref48">↩</a></li>
+        <li id="fn49">HART, 1958, s. 607. <a class="backref" href="#fnref49">↩</a></li>
+        <li id="fn50">HART, 1958, s. 607. <a class="backref" href="#fnref50">↩</a></li>
+        <li id="fn51">HART, 1958, s. 607. <a class="backref" href="#fnref51">↩</a></li>
+        <li id="fn52">HART, 1958, s. 607. <a class="backref" href="#fnref52">↩</a></li>
+        <li id="fn53">TEBBIT, s. 81. <a class="backref" href="#fnref53">↩</a></li>
+        <li id="fn54">H. L. A. HART, “American Jurisprudence Through English Eyes: The Nightmare and the Noble Dream,” <em>Sibley Lecture Series</em>, 1977, s. 974. digitalcommons.law.uga.edu/lectures_pre_arch_lectures_sibley/33/. <a class="backref" href="#fnref54">↩</a></li>
+        <li id="fn55">TEBBIT, s. 81. <a class="backref" href="#fnref55">↩</a></li>
+        <li id="fn56">HART, 1997, s. 983. <a class="backref" href="#fnref56">↩</a></li>
+        <li id="fn57">Brian BIX, “H. L. A. Hart and the &quot;Open Texture&quot; of Language”, <em>Law and Philosophy</em>. Vol. 10, no. 1, Şub 1991, s. 51. <a class="backref" href="#fnref57">↩</a></li>
+        <li id="fn58">HART, 1994, s. 128. <a class="backref" href="#fnref58">↩</a></li>
+        <li id="fn59">HART, 1994, s. 252. <a class="backref" href="#fnref59">↩</a></li>
+        <li id="fn60">HART, 1994, s. 272. <a class="backref" href="#fnref60">↩</a></li>
+        <li id="fn61">HART, 1994, s. 252. <a class="backref" href="#fnref61">↩</a></li>
+        <li id="fn62">HART, 1994, s. 272. <a class="backref" href="#fnref62">↩</a></li>
+        <li id="fn63">HART, 1994, s. 273. <a class="backref" href="#fnref63">↩</a></li>
+        <li id="fn64">HART, 1958, s. 609n34. <a class="backref" href="#fnref64">↩</a></li>
+        <li id="fn65">Wilfred E. RUMBLE, “Note on the text,” <em>The Province of Jurisprudence Determined</em>, by Austin, Cambridge UP, 1995, s. xxv. <a class="backref" href="#fnref65">↩</a></li>
+        <li id="fn66">John AUSTIN, <em>The Province of Jurisprudence Determined</em> (Düzenleyen: Wilfred E. Rumble), Cambridge UP, 1995, s. 163. <a class="backref" href="#fnref66">↩</a></li>
+        <li id="fn67">AUSTIN, s. 163. <a class="backref" href="#fnref67">↩</a></li>
+        <li id="fn68">Jeremy BENTHAM, “Constitutional Law,” <em>The Works of Jeremy Bentham</em> içinde (Derleyen: John Bowring), Simpkin, Marshall &amp; Co., London, 1843, s. 26. <a class="backref" href="#fnref68">↩</a></li>
+        <li id="fn69">HART, 1958, s. 610. <a class="backref" href="#fnref69">↩</a></li>
+        <li id="fn70">HART, 1958, s. 608. <a class="backref" href="#fnref70">↩</a></li>
+        <li id="fn71">HART, 1994, s. 273. <a class="backref" href="#fnref71">↩</a></li>
+        <li id="fn72">HART, 1958, s. 608. <a class="backref" href="#fnref72">↩</a></li>
+        <li id="fn73">HART, 1958, s. 608. <a class="backref" href="#fnref73">↩</a></li>
+        <li id="fn74">HART, 1958, s. 610. <a class="backref" href="#fnref74">↩</a></li>
+        <li id="fn75">HART, 1958, ss. 610-611. <a class="backref" href="#fnref75">↩</a></li>
+        <li id="fn76">HART, 1958, s. 611. <a class="backref" href="#fnref76">↩</a></li>
+        <li id="fn77">HART, 1958, s. 611. <a class="backref" href="#fnref77">↩</a></li>
+        <li id="fn78">HART, 1958, s. 611. <a class="backref" href="#fnref78">↩</a></li>
+        <li id="fn79">HART, 1958, s. 614. <a class="backref" href="#fnref79">↩</a></li>
+        <li id="fn80">HART, 1958, s. 614. <a class="backref" href="#fnref80">↩</a></li>
+        <li id="fn81">FULLER, 1958, s. 663. <a class="backref" href="#fnref81">↩</a></li>
+        <li id="fn82">FULLER, 1958, s. 663. <a class="backref" href="#fnref82">↩</a></li>
+        <li id="fn83">FULLER, 1958, s. 663. <a class="backref" href="#fnref83">↩</a></li>
+        <li id="fn84">FULLER, 1958, s. 664. <a class="backref" href="#fnref84">↩</a></li>
+        <li id="fn85">FULLER, 1958, s. 665. <a class="backref" href="#fnref85">↩</a></li>
+        <li id="fn86">FULLER, 1958, s. 666. <a class="backref" href="#fnref86">↩</a></li>
+        <li id="fn87">FULLER, 1958, s. 667. <a class="backref" href="#fnref87">↩</a></li>
+        <li id="fn88">FULLER, 1958, s. 669. <a class="backref" href="#fnref88">↩</a></li>
+        <li id="fn89">Lawrence B. SOLUM, &quot;On the Indeterminacy Crisis: Critiquing Critical Dogma,&quot; <em>Georgetown Law Faculty Publications and Other Works</em>, 1957, 1987, ss. 478-79 scholarship.law.georgetown.edu/facpub/1957 <a class="backref" href="#fnref89">↩</a></li>
+        <li id="fn90">HART, 1958, s. 615. <a class="backref" href="#fnref90">↩</a></li>
+        <li id="fn91">FULLER, 1958, s. 666. <a class="backref" href="#fnref91">↩</a></li>
+        <li id="fn92">FULLER, 1958, s. 663. <a class="backref" href="#fnref92">↩</a></li>
+        <li id="fn93">FULLER, 1958, s. 663. <a class="backref" href="#fnref93">↩</a></li>
+        <li id="fn94">LLEWELLYN, 1930, s. 432. <a class="backref" href="#fnref94">↩</a></li>
+        <li id="fn95">HART, 1958, s.607 <a class="backref" href="#fnref95">↩</a></li>
+        <li id="fn96">FULLER, s. 669. <a class="backref" href="#fnref96">↩</a></li>
+        <li id="fn97">FULLER, 1958, s. 663. <a class="backref" href="#fnref97">↩</a></li>
+        <li id="fn98">SAUSSURE, s. 66. <a class="backref" href="#fnref98">↩</a></li>
+        <li id="fn99">SAUSSURE, 1959, s.66. <a class="backref" href="#fnref99">↩</a></li>
+        <li id="fn100">SAUSSURE, 1959, s.66. <a class="backref" href="#fnref100">↩</a></li>
+        <li id="fn101">SAUSSURE, 1959, s.67. <a class="backref" href="#fnref101">↩</a></li>
+        <li id="fn102">Roland BARTHES, Annette Lavers, and Colin Smith. <em>Elements of Semiology, </em>11. Baskı, Hill and Wang, New York, 1986, s. 89. <a class="backref" href="#fnref102">↩</a></li>
+        <li id="fn103">BARTHES, 1986, s.89. <a class="backref" href="#fnref103">↩</a></li>
+        <li id="fn104">BARTHES, 1986, s.89 <a class="backref" href="#fnref104">↩</a></li>
+        <li id="fn105">BARTHES, 1986, s.89 <a class="backref" href="#fnref105">↩</a></li>
+        <li id="fn106">Louis HJELMSLEV, <em>Prolegomena to a Theory of Language</em>, tr. Francis J. Whitfield, revised english ed., University of Wisconsin Press, New York, 1969, s.114. <a class="backref" href="#fnref106">↩</a></li>
+        <li id="fn107">BARTHES, 1986<em>, </em>s.<em> </em>90. <a class="backref" href="#fnref107">↩</a></li>
+        <li id="fn108">BARTHES, 1986, s. 91. <a class="backref" href="#fnref108">↩</a></li>
+        <li id="fn109">Roland BARTHES. <em>Mythologies. </em>The Noonday Press, New York, 1972, s. 107. <a class="backref" href="#fnref109">↩</a></li>
+        <li id="fn110">BARTHES, 1972, s. 113. <a class="backref" href="#fnref110">↩</a></li>
+        <li id="fn111">BARTHES, 1972, s. 113. <a class="backref" href="#fnref111">↩</a></li>
+        <li id="fn112">BARTHES, 1972, s. 114. <a class="backref" href="#fnref112">↩</a></li>
+        <li id="fn113">BARTHES, 1972, s. 114. <a class="backref" href="#fnref113">↩</a></li>
+        <li id="fn114">BARTHES, 1972, s. 114. <a class="backref" href="#fnref114">↩</a></li>
+        <li id="fn115">BARTHES, 1972, s. 114. <a class="backref" href="#fnref115">↩</a></li>
+        <li id="fn116">BARTHES, 1972, s. 114. <a class="backref" href="#fnref116">↩</a></li>
+        <li id="fn117">BARTHES, 1972, s. 115. <a class="backref" href="#fnref117">↩</a></li>
+        <li id="fn118">HART, s. 607. <a class="backref" href="#fnref118">↩</a></li>
+        <li id="fn119">HART, s. 607. <a class="backref" href="#fnref119">↩</a></li>
+        <li id="fn120">HART, s. 607. <a class="backref" href="#fnref120">↩</a></li>
+        <li id="fn121">HART, s. 663. <a class="backref" href="#fnref121">↩</a></li>
+        <li id="fn122">HART, s. 663. <a class="backref" href="#fnref122">↩</a></li>
+        <li id="fn123">BARTHES, 1972, s. 109. <a class="backref" href="#fnref123">↩</a></li>
+        <li id="fn124">HART, s. 612. <a class="backref" href="#fnref124">↩</a></li>
+        <li id="fn125">HART, s. 614. <a class="backref" href="#fnref125">↩</a></li>
+        <li id="fn126">HJELMSLEV, s. 3. <a class="backref" href="#fnref126">↩</a></li>
+        <li id="fn127">SAUSSURE, s. 66. <a class="backref" href="#fnref127">↩</a></li>
+        <li id="fn128">SAUSSURE, s. 71. <a class="backref" href="#fnref128">↩</a></li>
+        </ol>
+        <h2>KAYNAKÇA</h2>
+        <div class="refs">
+        <p>AUSTIN, John, <em>The Province of Jurisprudence Determined</em> (Düzenleyen: Wilfred E. Rumble), Cambridge UP, 1995.</p>
+        <p>BARTHES, Roland, <em>Elements of Semiology </em>(Çeviren: Annette Lavers, and Colin Smith),<em> </em>11. Baskı, Hill and Wang, New York, 1986.</p>
+        <p>BARTHES, Roland, <em>Mythologies. </em>The Noonday Press, New York, 1972.</p>
+        <p>BENTHAM, Jeremy, <em>A Fragment on Government</em> (Düzenleyen: F.C. Montague), Clarendon Press, Oxford, 1891.</p>
+        <p>BENTHAM, Jeremy, “Constitutional Law,” <em>The Works of Jeremy Bentham </em>içinde (Derleyen: John Bowring), Simpkin, Marshall &amp; Co., London, 1843, ss. 1-144.</p>
+        <p>BIX, Brian, “H. L. A. Hart and the &quot;Open Texture&quot; of Language”, <em>Law and Philosophy</em>. Vol. 10, no. 1, Şub 1991, ss. 51-72.</p>
+        <p>BLACKSTONE, William, <em>Commentaries on the Laws of England</em>., Childs and Peterson, Philadelphia, 1860.</p>
+        <p>FULLER, Lon L, “Positivism and Fidelity to Law: A Reply to Professor Hart,” <em>Harvard Law Review</em>, vol. 71, no. 4, Şub 1958, ss. 630-672, doi: 10.2307/1338226</p>
+        <p>FULLER, Lon L, <em>The Morality of Law</em>, revised edition, Yale University Press, New Haven and London, 1969.</p>
+        <p>HART, H. L. A, “American Jurisprudence Through English Eyes: The Nightmare and the Noble Dream,” <em>Sibley Lecture Series</em>, 1977. ss. 969-989. digitalcommons.law.uga.edu/lectures_pre_arch_lectures_sibley/33/.</p>
+        <p>HART, H. L. A, “Positivism and the Separation of Law and Morals,” <em>Harvard Law Review</em>, vol. 71, no. 4, Şub. 1958, ss. 593–629. doi:10.2307/1338225</p>
+        <p>HART, H.L.A, <em>Concept of Law</em>, Second Edition, Oxford University Press, 1994.</p>
+        <p>HAUSER-SCHÄUBLIN, Brigitt,. “Changing Contexts, Shifting Meanings: The Cook/Forster Collection, For Example.” <em>Changing Contexts, Shifting Meanings: Transformation of Cultural Traditon in Ocenia</em> içinde (Derleyen: Elfriede Hermann), University of Hawaii Press, 2011, ss. 20-37.</p>
+        <p>HJELMSLEV, Louis, <em>Prolegomena to a Theory of Language</em> (Çeviren: Francis J. Whitfield), Revised English ed., University of Wisconsin Press, Madison, 1969.</p>
+        <p>JONES, Harry W, “Law and Morality in the Perspective of Legal Realism,” <em>Columbia Law Review</em>, vol. 61, no. 5, May 1961, ss. 799-809.</p>
+        <p>LİEBWALD, Doris, “Law’s Capacity for Vagueness,” <em>International Journal for the Semiotics of Law</em>, vol. 26, no. 2, 2012, ss. 391-423. doi: 10.1007/s11196-012-9288-3</p>
+        <p>LLEWELLYN, Karl N, “A Realistic Jurisprudence — The Next Step,” <em>Columbia Law Review</em>, vol. 30, no. 4, Nis. 1930, ss. 431-465.</p>
+        <p>LLEWELLYN, Karl N, “Some Realism about Realism: Responding to Dean Pound,” <em>Harvard Law Review</em>, vol. 44, no. 7, Haz. 1931, ss. 1222-1264.</p>
+        <p>PICKERING, Danby, <em>The Statutes at Large: From the Second to the 9th Year of King George II.</em>, Joseph Bentham, Cambridge, 1765.</p>
+        <p>PLATO, <em>Plato in Twelve Volumes</em>, Vols. 5 &amp; 6 (Çeviren: Paul Shorey), Harvard University Press, Cambridge, MA,; William Heinemann Ltd., London, 1969. Perseus Digital Library. data.perseus.org/citations/urn:cts:greekLit:tlg0059.tlg030.perseus-eng1:10.596e</p>
+        <p>RUMBLE, Wilfred E, “Note on the text,” <em>The Province of Jurisprudence Determined</em>, by Austin, Cambridge UP, 1995, ss. xxv-xxvii.</p>
+        <p>SAUSSURE, Ferdinand de, <em>Course in general linguistics</em>, The Philosophıcal Library, New York, 1959.</p>
+        <p>SOLUM, Lawrence B., &quot;On the Indeterminacy Crisis: Critiquing Critical Dogma,&quot; <em>Georgetown Law Faculty Publications and Other Works</em>, 1957, 1987, ss. 462-503scholarship.law.georgetown.edu/facpub/1957</p>
+        <p>TEBBIT, Mark, <em>Philosophy of Law: An Introduction</em>, Third Edition, Routledge, 2017.</p>
+        </div>
+      </div>
+
+      <p class="back"><a href="blog.html">→ blog</a></p>
+    </article>
+  </div>
+  <script>
+    /** Cycle dim → normal → bright; icon shown via CSS + data-bright. */
+    (function () {
+      const KEY = "terrazza-bright";
+      const levels = ["dim", "normal", "bright"];
+      const names = { dim: "candle", normal: "bulb", bright: "spotlight" };
+      const btn = document.getElementById("bright");
+      function apply(level) {
+        if (level === "normal") document.documentElement.removeAttribute("data-bright");
+        else document.documentElement.setAttribute("data-bright", level);
+        btn.setAttribute("aria-label", "Reading brightness: " + names[level]);
+        btn.title = names[level];
+        try { localStorage.setItem(KEY, level); } catch (_) {}
+      }
+      let level = "normal";
+      try {
+        const saved = localStorage.getItem(KEY);
+        if (saved && levels.indexOf(saved) !== -1) level = saved;
+        else if (window.matchMedia("(prefers-color-scheme: light)").matches) level = "bright";
+      } catch (_) {}
+      apply(level);
+      btn.addEventListener("click", function () {
+        level = levels[(levels.indexOf(level) + 1) % levels.length];
+        apply(level);
+      });
+    })();
+  </script>
+</body>
+</html>
