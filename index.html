@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="alternate" type="application/rss+xml" title="terrazza" href="rss.xml">
+  <link rel="icon" type="image/png" href="assets/logo.png">
+  <title>Egemen Bahadır Dumludağ</title>
+  <style>
+    :root {
+      --ink: #e6e2da;
+      --mute: #9a948a;
+      --mare: #6b7cff;
+      --footer-h: 3.5rem;
+    }
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      height: 100%;
+      overflow: hidden;
+      font-family: "IBM Plex Mono", "Consolas", "Courier New", monospace;
+      color: var(--ink);
+      background: #07080c;
+    }
+    canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      cursor: grab;
+      touch-action: none;
+    }
+    canvas.dragging { cursor: grabbing; }
+
+    .dock {
+      position: fixed;
+      inset: 0;
+      bottom: var(--footer-h);
+      pointer-events: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      overflow-y: auto;
+    }
+    .panel {
+      pointer-events: auto;
+      width: min(36rem, 100%);
+      transition: opacity 0.2s ease, transform 0.2s ease;
+      font-family: Georgia, Garamond, serif;
+      line-height: 1.6;
+    }
+    body.stowed .panel {
+      opacity: 0;
+      transform: translateY(0.5rem);
+      pointer-events: none;
+      visibility: hidden;
+    }
+
+    /* sine wave */
+    .sine-wave {
+      display: block;
+      width: 100%;
+      height: auto;
+      margin: 8px 0 14px;
+      cursor: default;
+    }
+
+    /* greeting + wheel */
+    .oh {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 0.45em;
+      min-height: 4.65em;
+      margin: 0 0 0.6rem;
+      font-size: 1.45em;
+      line-height: 1.55;
+    }
+    .oh-lead {
+      position: relative;
+      display: inline-block;
+      flex-shrink: 0;
+    }
+    .oh-sizer { visibility: hidden; white-space: nowrap; }
+    .oh-live { position: absolute; left: 0; top: 0; white-space: nowrap; }
+    .oh-type { white-space: pre; }
+    .typing-cursor {
+      display: inline-block;
+      width: 0.42em;
+      height: 1em;
+      background: var(--ink);
+      vertical-align: text-bottom;
+      animation: caret-blink 1s step-end infinite;
+    }
+    .typing-cursor.is-off { visibility: hidden; }
+    @keyframes caret-blink {
+      0%, 50% { opacity: 1; }
+      51%, 100% { opacity: 0; }
+    }
+    .who-wheel {
+      position: relative;
+      flex-shrink: 0;
+      width: max-content;
+      height: 4.65em;
+      opacity: 0;
+      pointer-events: none;
+    }
+    .who-wheel.is-in { opacity: 1; pointer-events: auto; }
+    .who-sizer {
+      display: block;
+      visibility: hidden;
+      height: 0;
+      overflow: hidden;
+      padding: 0 0.9em 0 0.4em;
+      font-style: italic;
+      white-space: nowrap;
+    }
+    .who-window {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 34%, #000 66%, transparent 100%);
+      mask-image: linear-gradient(to bottom, transparent 0%, #000 34%, #000 66%, transparent 100%);
+    }
+    .who-reel { display: flex; flex-direction: column; }
+    .who-opt {
+      display: flex;
+      align-items: center;
+      flex-shrink: 0;
+      height: 1.55em;
+      padding: 0 0.9em 0 0.4em;
+      color: var(--ink);
+      font-style: italic;
+      white-space: nowrap;
+    }
+
+    /* about copy */
+    .about-copy p {
+      margin-bottom: 0.9rem;
+      text-align: justify;
+    }
+    .about-copy {
+      min-height: 0;
+    }
+    .about-copy a { color: #a8b8ff; }
+    .about-copy a:hover { color: #c4d0ff; }
+
+    /* footer — identical to index */
+    .rail {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: var(--footer-h);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 0 1.25rem;
+      pointer-events: none;
+      background: linear-gradient(180deg, rgba(7, 8, 12, 0.35), #07080c 55%);
+      border-top: 1px solid rgba(107, 124, 255, 0.18);
+      font-size: 0.72rem;
+      color: var(--mute);
+      z-index: 2;
+    }
+    .rail .notes {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .rail .notes b { color: var(--mare); font-weight: 700; }
+    .rail .notes a {
+      color: inherit;
+      pointer-events: auto;
+    }
+    .rail .notes a:hover { color: var(--ink); }
+    .stow {
+      pointer-events: auto;
+      flex-shrink: 0;
+      width: 4rem;
+      padding: 0.4rem 0;
+      text-align: center;
+      font: inherit;
+      font-size: 0.78rem;
+      letter-spacing: 0.05em;
+      color: var(--mute);
+      background: rgba(8, 10, 16, 0.85);
+      border: 1px solid #5c564c;
+      cursor: pointer;
+      transition: color 1.6s ease, background 1.6s ease, border-color 1.6s ease, box-shadow 1.6s ease, text-shadow 1.6s ease, opacity 2s ease;
+    }
+    .stow:hover { color: var(--ink); border-color: var(--mute); }
+    .stow.blog-glow {
+      position: relative;
+      z-index: 7;
+      color: #f3eef9;
+      background: rgba(18, 20, 30, 0.96);
+      border-color: rgba(243, 238, 249, 0.96);
+      box-shadow: 0 0 0.85rem rgba(243, 238, 249, 0.28), 0 0 2.1rem rgba(243, 238, 249, 0.2);
+      text-shadow: 0 0 0.7rem rgba(243, 238, 249, 0.95);
+    }
+    body.deviant-hover .rail,
+    .rail:has(.blog-glow) {
+      z-index: 6;
+    }
+    .rail .notes { transition: opacity 2s ease; }
+    body.deviant-hover .rail .notes,
+    body.deviant-hover #stow {
+      opacity: 0.14;
+    }
+
+    /* page-dim overlay (deviant reader) */
+    #deviant-dim {
+      position: fixed;
+      inset: 0;
+      background: rgba(4, 5, 9, 0);
+      pointer-events: none;
+      z-index: 5;
+      transition: background 2s ease;
+    }
+    #deviant-dim.active { background: rgba(4, 5, 9, 0.82); }
+    #deviant-dim.snap, .stow.snap { transition: none !important; }
+
+    /* cat bloom + generic bloom */
+    .cat-bloom {
+      position: fixed;
+      pointer-events: none;
+      z-index: 10;
+      font-size: 1rem;
+      opacity: 0;
+      transform: translate(-50%, -50%) scale(0.2);
+      transition: none;
+      will-change: transform, opacity;
+    }
+    .captcha-bloom {
+      letter-spacing: 0.11em;
+      text-transform: uppercase;
+      text-shadow: 0 0 0.35rem rgba(243, 238, 249, 0.45);
+      filter: blur(0.15px);
+    }
+    .cat-bloom.pop {
+      animation: cat-pop 2.2s ease-out forwards;
+    }
+    @keyframes cat-pop {
+      0%   { opacity: 0;   transform: translate(-50%, -50%) scale(0.1) rotate(var(--rot0)); }
+      18%  { opacity: 0.9; transform: translate(-50%, -50%) translate(var(--dx), var(--dy)) scale(1.1) rotate(var(--rot1)); }
+      55%  { opacity: 0.7; transform: translate(-50%, -50%) translate(var(--dx), var(--dy)) scale(1)   rotate(var(--rot1)); }
+      100% { opacity: 0;   transform: translate(-50%, -50%) translate(var(--dx), var(--dy)) scale(0.7) rotate(var(--rot2)); }
+    }
+  </style>
+</head>
+<body>
+  <canvas id="sky" aria-label="Drag to look around."></canvas>
+  <div id="deviant-dim"></div>
+
+  <div class="dock">
+    <main class="panel" id="panel">
+      <p class="oh">
+        <span class="oh-lead">
+          <span class="oh-sizer">Oh, you are</span>
+          <span class="oh-live"><span class="oh-type"></span><span class="typing-cursor"></span></span>
+        </span>
+        <span class="who-wheel">
+          <span class="who-sizer">just a bit curious</span>
+          <span class="who-window" tabindex="0" role="listbox" aria-label="who you are">
+            <span class="who-reel">
+              <span class="who-opt"></span>
+              <span class="who-opt"></span>
+              <span class="who-opt"></span>
+            </span>
+          </span>
+        </span>
+      </p>
+      <canvas class="sine-wave" aria-hidden="true"></canvas>
+      <div class="about-copy">
+        <p>Welcome! :) I'm Egemen Bahadır Dumludağ.</p>
+        <p>I care about trying to be a good person and finding out what that means.</p>
+        <p>I love thinking and I believe it can be a group activity. Reach out if you enjoy sharing your ideal of good with others and contemplating on it.</p>
+      </div>
+    </main>
+  </div>
+
+  <footer class="rail">
+    <p class="notes">
+      looking <b id="bearing">N</b>
+      ·  lat 41°N · lon 29°E · <a href="https://www.linkedin.com/in/egemenbd/">linkedin</a>
+    </p>
+    <div style="display:flex;gap:0.5rem;pointer-events:auto">
+      <button type="button" class="stow" id="blog-link" onclick="sessionStorage.setItem('sky_yaw',yaw);sessionStorage.setItem('sky_pitch',pitch);location.href='blog.html'">blog</button>
+      <button type="button" class="stow" id="stow" aria-controls="panel" aria-expanded="true">hide</button>
+    </div>
+  </footer>
+
+  <script>
+    // — sine wave —
+    const sineCanvas = document.querySelector("canvas.sine-wave");
+    const g = sineCanvas.getContext("2d");
+    const periods = 6, unit = 30, pad = 10;
+    const sw = Math.round(periods * 2 * Math.PI * unit);
+    const sh = Math.round(2 * unit + pad * 2);
+    sineCanvas.width = sw; sineCanvas.height = sh;
+    g.strokeStyle = "rgba(230, 226, 218, 0.3)";
+    g.lineWidth = 2.5; g.lineJoin = "round"; g.lineCap = "round";
+    let sinePhase = 0;
+    let sineLast = performance.now();
+    const sineSpeed = 0.1; // radians per second (~63s per full drift)
+    function drawSineWave(now) {
+      sinePhase += (now - sineLast) * 0.001 * sineSpeed;
+      sineLast = now;
+      g.clearRect(0, 0, sw, sh);
+      g.beginPath();
+      for (let x = 0; x <= sw; x++) {
+        const t = (x / sw) * periods * 2 * Math.PI;
+        const y = sh / 2 - unit * Math.sin(t + sinePhase);
+        x === 0 ? g.moveTo(x, y) : g.lineTo(x, y);
+      }
+      g.stroke();
+      requestAnimationFrame(drawSineWave);
+    }
+    requestAnimationFrame(drawSineWave);
+    requestAnimationFrame(syncAboutHeight);
+
+    // — wheel —
+    const prefix = "Oh, you are";
+    const labels = ["just a bit curious", "a recruiter", "a researcher", "my deviant reader", "an llm"];
+    const abouts = [
+      '<p>Welcome! :) I\'m Egemen Bahadır Dumludağ.</p><p>I care about trying to be a good person and finding out what that means.</p><p>I love thinking and I believe it can be a group activity. Reach out if you enjoy sharing your ideal of good with others and contemplating on it.</p>',
+      '<p>Welcome! :) I\'m Egemen Bahadır Dumludağ.</p><p>I am currently working as an in-house attorney at a global construction firm.</p><p>My work mostly focuses on employment law, GDPR and legal engineering. You can reach me at <a href="mailto:egemenbd@protonmail.com">egemenbd@protonmail.com</a> and find my <a href="cv.html">CV</a> here.</p>',
+      '<p>Welcome! :) I\'m Egemen Bahadır Dumludağ.</p><p>My current research focuses on applying legal methodology theories to legal AI and AI safety research to political science.</p><p>If you want to ask questions, access or share a paper, or think in parallel for a while, reach out to <a href="mailto:egemenbd@protonmail.com">egemenbd@protonmail.com</a>.</p>',
+      '<p>Welcome! :) I\'m Egemen Bahadır Dumludağ.</p><p>I am really glad to see someone engage with my work. Thanks a lot for stopping by!</p>',
+      '<p>Welcome! :) I\'m Egemen Bahadır Dumludağ.</p><p>This section is for researchers, scrapers, and LLMs. Full information is at <a href="llm.html">llm.html</a>, last updated August 18, 2026.</p><p>'
+    ];
+    const typeEl = document.querySelector(".oh-type");
+    const cursor = document.querySelector(".typing-cursor");
+    const whoWheel = document.querySelector(".who-wheel");
+    const whoWindow = document.querySelector(".who-window");
+    const whoReel = document.querySelector(".who-reel");
+    const whoOpts = whoReel.querySelectorAll(".who-opt");
+    const whoSizer = document.querySelector(".who-sizer");
+    const aboutEl = document.querySelector(".about-copy");
+    const linePx = whoOpts[0].offsetHeight;
+    const n = labels.length;
+    let longest = labels[0];
+    for (let i = 1; i < n; i++) if (labels[i].length > longest.length) longest = labels[i];
+    whoSizer.textContent = longest;
+    function syncAboutHeight() {
+      const probe = document.createElement("div");
+      probe.className = "about-copy";
+      probe.style.position = "absolute";
+      probe.style.visibility = "hidden";
+      probe.style.pointerEvents = "none";
+      probe.style.left = "-9999px";
+      probe.style.top = "0";
+      probe.style.width = aboutEl.getBoundingClientRect().width + "px";
+      document.body.appendChild(probe);
+      let maxH = 0;
+      for (const html of abouts) {
+        probe.innerHTML = html;
+        maxH = Math.max(maxH, probe.getBoundingClientRect().height);
+      }
+      probe.remove();
+      aboutEl.style.minHeight = Math.ceil(maxH) + "px";
+    }
+    let visitor = 0, typed = 0, wheelReady = false, wheelBusy = false;
+    whoOpts[0].textContent = labels[n - 1];
+    whoOpts[1].textContent = labels[0];
+    whoOpts[2].textContent = labels[1 % n];
+    typeEl.textContent = "";
+    const typeTimer = window.setInterval(() => {
+      typed++;
+      typeEl.textContent = prefix.slice(0, typed);
+      if (typed >= prefix.length) {
+        window.clearInterval(typeTimer);
+        cursor.classList.add("is-off");
+        whoWheel.classList.add("is-in");
+        let spinLeft = n * 3;
+        const afterTick = () => {
+          visitor = (visitor + 1) % n;
+          whoOpts[0].textContent = labels[(visitor + n - 1) % n];
+          whoOpts[1].textContent = labels[visitor];
+          whoOpts[2].textContent = labels[(visitor + 1) % n];
+          whoReel.style.transition = "none";
+          whoReel.style.transform = "translateY(0)";
+          whoReel.offsetHeight;
+          spinLeft--;
+          if (spinLeft > 0) {
+            const ms = 35 + (n * 5 - spinLeft) ** 2 * 0.36;
+            whoReel.style.transition = "transform " + ms + "ms linear";
+            whoReel.style.transform = "translateY(" + (-linePx) + "px)";
+            whoReel.addEventListener("transitionend", afterTick, { once: true });
+          } else {
+            aboutEl.innerHTML = abouts[0];
+            wheelReady = true;
+          }
+        };
+        whoReel.style.transition = "transform 35ms linear";
+        whoReel.style.transform = "translateY(" + (-linePx) + "px)";
+        whoReel.addEventListener("transitionend", afterTick, { once: true });
+      }
+    }, 70);
+    const spinWheel = (dir) => {
+      if (!wheelReady || wheelBusy) return;
+      hoverSuspended = true;
+      onWheelLeave(true);
+      wheelBusy = true;
+      whoReel.style.transition = "transform 0.38s cubic-bezier(0.4, 0.12, 0.2, 1)";
+      whoReel.style.transform = "translateY(" + (-dir * linePx) + "px)";
+      whoReel.addEventListener("transitionend", () => {
+        visitor = (visitor + dir + n) % n;
+        whoOpts[0].textContent = labels[(visitor + n - 1) % n];
+        whoOpts[1].textContent = labels[visitor];
+        whoOpts[2].textContent = labels[(visitor + 1) % n];
+        aboutEl.innerHTML = abouts[visitor];
+        whoReel.style.transition = "none";
+        whoReel.style.transform = "translateY(0)";
+        wheelBusy = false;
+        hoverSuspended = false;
+        if (whoWindow.matches(":hover")) onWheelEnter();
+      }, { once: true });
+    };
+    whoWindow.addEventListener("click", () => spinWheel(1));
+    whoWindow.addEventListener("wheel", (e) => { e.preventDefault(); spinWheel(e.deltaY > 0 ? 1 : -1); }, { passive: false });
+    whoWindow.addEventListener("keydown", (e) => {
+      if (!["ArrowDown","ArrowUp","Enter"," "].includes(e.key)) return;
+      e.preventDefault(); spinWheel(e.key === "ArrowUp" ? -1 : 1);
+    });
+    window.addEventListener("resize", syncAboutHeight);
+
+    // — hide button —
+    const stowBtn = document.getElementById("stow");
+    stowBtn.addEventListener("click", () => {
+      const stowed = document.body.classList.toggle("stowed");
+      stowBtn.textContent = stowed ? "show" : "hide";
+      stowBtn.setAttribute("aria-expanded", stowed ? "false" : "true");
+    });
+
+    // — draggable star sky —
+    const STARS = {
+      polaris:  { n: "Polaris",  ra: 2.5303, d: 89.2641, m: 1.97, nav: true },
+      kochab:   { n: "Kochab",   ra: 14.8451, d: 74.1555, m: 2.07 },
+      pherkad:  { n: "Pherkad",  ra: 15.3455, d: 71.8340, m: 3.04 },
+      yildun:   { n: "Yildun",   ra: 17.5369, d: 86.5865, m: 4.35 },
+      eps_umi:  { n: "",         ra: 16.7662, d: 82.0373, m: 4.21 },
+      zet_umi:  { n: "",         ra: 15.7343, d: 77.7945, m: 4.29 },
+      eta_umi:  { n: "",         ra: 16.2918, d: 75.7553, m: 4.95 },
+      dubhe:    { n: "Dubhe",    ra: 11.0621, d: 61.7510, m: 1.79, nav: true },
+      merak:    { n: "Merak",    ra: 11.0307, d: 56.3824, m: 2.37, nav: true },
+      phecda:   { n: "Phecda",   ra: 11.8971, d: 53.6948, m: 2.44 },
+      megrez:   { n: "Megrez",   ra: 12.2571, d: 57.0326, m: 3.31 },
+      alioth:   { n: "Alioth",   ra: 12.9005, d: 55.9598, m: 1.77 },
+      mizar:    { n: "Mizar",    ra: 13.3987, d: 54.9254, m: 2.27 },
+      alkaid:   { n: "Alkaid",   ra: 13.7923, d: 49.3133, m: 1.86 },
+      schedar:  { n: "Schedar",  ra: 0.6751,  d: 56.5373, m: 2.24 },
+      caph:     { n: "Caph",     ra: 0.1529,  d: 59.1498, m: 2.28 },
+      gamcas:   { n: "Navi",     ra: 0.9451,  d: 60.7167, m: 2.15 },
+      ruchbah:  { n: "Ruchbah",  ra: 1.4302,  d: 60.2353, m: 2.66 },
+      segin:    { n: "Segin",    ra: 1.9066,  d: 63.6701, m: 3.35 },
+      vega:     { n: "Vega",     ra: 18.6156, d: 38.7837, m: 0.03, nav: true },
+      sheliak:  { n: "",         ra: 18.8347, d: 33.3627, m: 3.52 },
+      sulafat:  { n: "",         ra: 18.9823, d: 32.6899, m: 3.25 },
+      deneb:    { n: "Deneb",    ra: 20.6905, d: 45.2803, m: 1.25, nav: true },
+      sadr:     { n: "Sadr",     ra: 20.3766, d: 40.2567, m: 2.23 },
+      gienahc:  { n: "",         ra: 20.7701, d: 33.9703, m: 2.48 },
+      delta_cyg:{ n: "",         ra: 19.7495, d: 45.1308, m: 2.87 },
+      albireo:  { n: "Albireo",  ra: 19.5120, d: 27.9597, m: 3.08 },
+      altair:   { n: "Altair",   ra: 19.8464, d: 8.8683,  m: 0.76, nav: true },
+      tarazed:  { n: "",         ra: 19.7703, d: 10.6133, m: 2.72 },
+      alshain:  { n: "",         ra: 19.9219, d: 6.4068,  m: 3.71 },
+      arcturus: { n: "Arcturus", ra: 14.2610, d: 19.1824, m: -0.05, nav: true },
+      nekkar:   { n: "",         ra: 15.0324, d: 40.3906, m: 3.49 },
+      seginus:  { n: "",         ra: 14.5345, d: 38.3083, m: 3.04 },
+      rho_boo:  { n: "",         ra: 14.5307, d: 30.3713, m: 3.57 },
+      izar:     { n: "",         ra: 14.7497, d: 27.0742, m: 2.35 },
+      capella:  { n: "Capella",  ra: 5.2782,  d: 45.9980, m: 0.08, nav: true },
+      menkalinan:{ n: "",        ra: 5.9922,  d: 44.9474, m: 1.90 },
+      hassaleh: { n: "",         ra: 4.9499,  d: 33.1663, m: 2.69 },
+      almaaz:   { n: "",         ra: 5.0255,  d: 43.8233, m: 2.99 },
+      haedus:   { n: "",         ra: 5.1086,  d: 41.2345, m: 3.17 },
+      betelgeuse:{ n: "Betelgeuse", ra: 5.9195, d: 7.4071, m: 0.42, nav: true },
+      bellatrix:{ n: "Bellatrix", ra: 5.4189, d: 6.3497, m: 1.64 },
+      alnitak:  { n: "Alnitak",  ra: 5.6793,  d: -1.9426, m: 1.77 },
+      alnilam:  { n: "Alnilam",  ra: 5.6036,  d: -1.2019, m: 1.69 },
+      mintaka:  { n: "Mintaka",  ra: 5.5334,  d: -0.2991, m: 2.23 },
+      saiph:    { n: "Saiph",    ra: 5.7959,  d: -9.6696, m: 2.09 },
+      rigel:    { n: "Rigel",    ra: 5.2423,  d: -8.2016, m: 0.13, nav: true },
+      castor:   { n: "Castor",   ra: 7.5766,  d: 31.8883, m: 1.58, nav: true },
+      pollux:   { n: "Pollux",   ra: 7.7553,  d: 28.0262, m: 1.14, nav: true },
+      alhena:   { n: "Alhena",   ra: 6.6286,  d: 16.3993, m: 1.93 },
+      mebsuta:  { n: "",         ra: 6.6285,  d: 25.1311, m: 3.06 },
+      tejat:    { n: "",         ra: 6.3827,  d: 22.5068, m: 2.88 },
+      propus:   { n: "",         ra: 6.2483,  d: 22.5062, m: 3.31 },
+      regulus:  { n: "Regulus",  ra: 10.1395, d: 11.9672, m: 1.35, nav: true },
+      algieba:  { n: "",         ra: 10.3328, d: 19.8415, m: 2.08 },
+      denebola: { n: "Denebola", ra: 11.8177, d: 14.5721, m: 2.14 },
+      zosma:    { n: "",         ra: 11.2351, d: 20.5237, m: 2.56 },
+      chertan:  { n: "",         ra: 11.2354, d: 15.4295, m: 3.33 },
+      aldebaran:{ n: "Aldebaran", ra: 4.5987, d: 16.5093, m: 0.87, nav: true },
+      elnath:   { n: "Elnath",   ra: 5.4382,  d: 28.6075, m: 1.65 },
+      ain:      { n: "",         ra: 4.4777,  d: 19.1805, m: 3.53 },
+      alkala:   { n: "",         ra: 4.3299,  d: 15.6276, m: 3.40 },
+      spica:    { n: "Spica",    ra: 13.4199, d: -11.1613, m: 0.97, nav: true },
+      heze:     { n: "",         ra: 13.5782, d: -0.5958,  m: 3.38 },
+      porrima:  { n: "",         ra: 12.6920, d: -1.4494,  m: 2.74 },
+      vindem:   { n: "",         ra: 13.0363, d: 10.9592, m: 2.85 },
+      algol:    { n: "Algol",    ra: 3.1361,  d: 40.9556, m: 2.09 },
+      mirfak:   { n: "Mirfak",   ra: 3.4054,  d: 49.8612, m: 1.79, nav: true },
+      ataxia:   { n: "",         ra: 3.1508,  d: 44.8579, m: 3.77 },
+      gorgonea: { n: "",         ra: 3.0863,  d: 38.8402, m: 3.39 },
+      hamal:    { n: "Hamal",    ra: 2.1195,  d: 23.4624, m: 2.01 },
+      sheratan: { n: "",         ra: 1.9106,  d: 20.8081, m: 2.64 },
+      mesarthim:{ n: "",         ra: 1.9107,  d: 19.2939, m: 3.88 },
+      rasalhague:{ n: "Rasalhague", ra: 17.5822, d: 12.5600, m: 2.08 },
+      cebelrai: { n: "",         ra: 17.7246, d: 4.5671,  m: 2.76 },
+      etamin:   { n: "Eltanin",  ra: 17.9434, d: 51.4889, m: 2.23 },
+      rastaban: { n: "",         ra: 17.5075, d: 52.3014, m: 2.79 },
+      grumium:  { n: "",         ra: 17.5092, d: 55.1842, m: 3.73 },
+      thuban:   { n: "Thuban",   ra: 14.0732, d: 64.3758, m: 3.67 },
+      markab:   { n: "Markab",   ra: 23.0793, d: 15.2053, m: 2.49 },
+      scheat:   { n: "Scheat",   ra: 23.0629, d: 28.0828, m: 2.44 },
+      algeman:  { n: "Algenib",  ra: 0.2206,  d: 15.1836, m: 2.83 },
+      enif:     { n: "Enif",     ra: 21.7364, d: 9.8750,  m: 2.38 },
+      formalhaut:{ n: "Fomalhaut", ra: 22.9608, d: -29.6222, m: 1.16, nav: true }
+    };
+    const canvas = document.getElementById("sky");
+    const ctx = canvas.getContext("2d");
+    const LAT = 41, LON = 29, FOV = 1.05, DEG = Math.PI / 180;
+    let w = 0, h = 0, dpr = 1;
+    let yaw = parseFloat(sessionStorage.getItem("sky_yaw") || "0");
+    let pitch = parseFloat(sessionStorage.getItem("sky_pitch") || "0.55");
+    let lst = 16.5;
+    let dragging = false, lastX = 0, lastY = 0;
+    const footerPx = 56;
+
+    function wrap360(x) { x %= 360; return x < 0 ? x + 360 : x; }
+    function julianDay(d) { return d.getTime() / 86400000 + 2440587.5; }
+    function siderealHours(jd, lonDeg) {
+      const T = (jd - 2451545.0) / 36525;
+      let gmst = 280.46061837 + 360.98564736629 * (jd - 2451545.0) + 0.000387933 * T * T;
+      return wrap360(gmst + lonDeg) / 15;
+    }
+    function kepler(M, e) {
+      let E = M + e * Math.sin(M);
+      for (let i = 0; i < 8; i++) {
+        const d = E - e * Math.sin(E) - M;
+        E -= d / (1 - e * Math.cos(E));
+      }
+      return E;
+    }
+    function planetHelio(jd, el) {
+      const T = (jd - 2451545.0) / 36525;
+      const a = el.a + el.da * T, e = el.e + el.de * T;
+      const I = (el.I + el.dI * T) * DEG, L = wrap360(el.L + el.dL * T) * DEG;
+      const wbar = wrap360(el.wbar + el.dwbar * T) * DEG, O = wrap360(el.O + el.dO * T) * DEG;
+      const M = ((L - wbar + Math.PI * 3) % (Math.PI * 2)) - Math.PI;
+      const E = kepler(M, e);
+      const x = a * (Math.cos(E) - e), y = a * Math.sqrt(1 - e * e) * Math.sin(E);
+      const w = wbar - O;
+      const cosO = Math.cos(O), sinO = Math.sin(O), cosI = Math.cos(I), sinI = Math.sin(I);
+      const cosw = Math.cos(w), sinw = Math.sin(w);
+      return {
+        x: (cosw * cosO - sinw * sinO * cosI) * x + (-sinw * cosO - cosw * sinO * cosI) * y,
+        y: (cosw * sinO + sinw * cosO * cosI) * x + (-sinw * sinO + cosw * cosO * cosI) * y,
+        z: (sinw * sinI) * x + (cosw * sinI) * y
+      };
+    }
+    function eclipticToRaDec(lonDeg, latDeg, dist) {
+      const eps = 23.439291 * DEG, b = latDeg * DEG, l = lonDeg * DEG;
+      const x = dist * Math.cos(b) * Math.cos(l);
+      const y = dist * Math.cos(b) * Math.sin(l);
+      const z = dist * Math.sin(b);
+      const ye = y * Math.cos(eps) - z * Math.sin(eps);
+      const ze = y * Math.sin(eps) + z * Math.cos(eps);
+      let ra = Math.atan2(ye, x);
+      if (ra < 0) ra += Math.PI * 2;
+      return { ra: ra / DEG / 15, d: Math.asin(ze / dist) / DEG };
+    }
+    const ORBITS = {
+      mercury: { a: 0.38709927, da: 0.00000037, e: 0.20563593, de: 0.00001906, I: 7.00497902, dI: -0.00594749, L: 252.25032350, dL: 149472.67411175, wbar: 77.45779628, dwbar: 0.16047689, O: 48.33076593, dO: -0.12534081 },
+      venus: { a: 0.72333566, da: 0.00000390, e: 0.00677672, de: -0.00004107, I: 3.39467605, dI: -0.00078890, L: 181.97909950, dL: 58517.81538729, wbar: 131.60246718, dwbar: 0.00268329, O: 76.67984255, dO: -0.27769418 },
+      earth: { a: 1.00000261, da: 0.00000562, e: 0.01671123, de: -0.00004392, I: -0.00001531, dI: -0.01294668, L: 100.46457166, dL: 35999.37244981, wbar: 102.93768193, dwbar: 0.32327364, O: 0.0, dO: 0.0 },
+      mars: { a: 1.52371034, da: 0.00001847, e: 0.09339410, de: 0.00007882, I: 1.84969142, dI: -0.00813131, L: -4.55343205, dL: 19140.30268499, wbar: -23.94362959, dwbar: 0.44441088, O: 49.55953891, dO: -0.29257343 },
+      jupiter: { a: 5.20288700, da: -0.00011607, e: 0.04838624, de: -0.00013253, I: 1.30439695, dI: -0.00183714, L: 34.39644051, dL: 3034.74612775, wbar: 14.72847983, dwbar: 0.21252668, O: 100.47390909, dO: 0.20469106 },
+      saturn: { a: 9.53667594, da: -0.00125060, e: 0.05386179, de: -0.00050991, I: 2.48599187, dI: 0.00193609, L: 49.95424423, dL: 1222.49362201, wbar: 92.59887831, dwbar: -0.41897216, O: 113.66242448, dO: -0.28867794 }
+    };
+    const PLANETS = ["mercury", "venus", "mars", "jupiter", "saturn"];
+    function moonEquatorial(jd) {
+      const d = jd - 2451545.0;
+      const Lp = wrap360(218.316 + 13.176396 * d);
+      const M = wrap360(134.963 + 13.064993 * d) * DEG;
+      const F = wrap360(93.272 + 13.229350 * d) * DEG;
+      const lon = wrap360(Lp + 6.289 * Math.sin(M));
+      const lat = 5.128 * Math.sin(F);
+      const dist = 385001 - 20905 * Math.cos(M);
+      return eclipticToRaDec(lon, lat, dist / 149597870.7);
+    }
+    let solarBodies = [];
+    function updateEphemeris() {
+      const jd = julianDay(new Date());
+      lst = siderealHours(jd, LON);
+      const earth = planetHelio(jd, ORBITS.earth);
+      const bodies = [];
+      for (const id of PLANETS) {
+        const hxyz = planetHelio(jd, ORBITS[id]);
+        const x = hxyz.x - earth.x, y = hxyz.y - earth.y, z = hxyz.z - earth.z;
+        const dist = Math.sqrt(x * x + y * y + z * z);
+        const eq = eclipticToRaDec(wrap360(Math.atan2(y, x) / DEG), Math.asin(z / dist) / DEG, dist);
+        bodies.push({ ra: eq.ra, d: eq.d, m: 1.2 });
+      }
+      const moon = moonEquatorial(jd);
+      bodies.push({ ra: moon.ra, d: moon.d, m: 0.4 });
+      solarBodies = bodies;
+    }
+    function toAltAz(raH, decD) {
+      const ra = raH * 15 * DEG, dec = decD * DEG;
+      const lstR = lst * 15 * DEG, lat = LAT * DEG, ha = lstR - ra;
+      const sinAlt = Math.sin(dec)*Math.sin(lat) + Math.cos(dec)*Math.cos(lat)*Math.cos(ha);
+      const alt = Math.asin(Math.max(-1, Math.min(1, sinAlt)));
+      const cosAlt = Math.max(1e-6, Math.cos(alt));
+      const sinAz = (-Math.cos(dec)*Math.sin(ha)) / cosAlt;
+      const cosAz = (Math.sin(dec)*Math.cos(lat) - Math.cos(dec)*Math.sin(lat)*Math.cos(ha)) / cosAlt;
+      let az = Math.atan2(sinAz, cosAz);
+      if (az < 0) az += Math.PI * 2;
+      return { alt, az };
+    }
+    function project(alt, az) {
+      const ca = Math.cos(alt), sa = Math.sin(alt);
+      const vx = ca*Math.sin(az), vy = ca*Math.cos(az), vz = sa;
+      const cp = Math.cos(pitch), sp = Math.sin(pitch);
+      const cy = Math.cos(yaw), sy = Math.sin(yaw);
+      const fx = cp*sy, fy = cp*cy, fz = sp;
+      const rx = cy, ry = -sy;
+      const ux = -sp*sy, uy = -sp*cy, uz = cp;
+      const fwd = vx*fx + vy*fy + vz*fz;
+      if (fwd < 0.08) return null;
+      const right = vx*rx + vy*ry;
+      const up = vx*ux + vy*uy + vz*uz;
+      const scale = Math.min(w, h - footerPx) * 0.62 / Math.tan(FOV / 2);
+      return { x: w/2 + (right/fwd)*scale, y: (h-footerPx)/2 - (up/fwd)*scale };
+    }
+    const bearingEl = document.getElementById("bearing");
+    function bearingName(rad) {
+      const deg = ((rad * 180 / Math.PI) % 360 + 360) % 360;
+      const names = ["N","NNE","NE","ENE","E","ESE","SE","SSE","S","SSW","SW","WSW","W","WNW","NW","NNW"];
+      return names[Math.round(deg / 22.5) % 16] + " · " + deg.toFixed(0) + "°";
+    }
+    function draw() {
+      updateEphemeris();
+      const skyH = h - footerPx;
+      const sky = ctx.createLinearGradient(0, 0, 0, skyH);
+      sky.addColorStop(0, "#070a14");
+      sky.addColorStop(0.55, "#0a0e1a");
+      sky.addColorStop(1, "#0d1220");
+      ctx.fillStyle = sky;
+      ctx.fillRect(0, 0, w, h);
+      const fade = ctx.createLinearGradient(0, skyH - 48, 0, h);
+      fade.addColorStop(0, "rgba(7,8,12,0)");
+      fade.addColorStop(0.55, "rgba(7,8,12,0.55)");
+      fade.addColorStop(1, "#07080c");
+      ctx.fillStyle = fade;
+      ctx.fillRect(0, skyH - 48, w, h - (skyH - 48));
+      bearingEl.textContent = bearingName(yaw);
+      const dots = [...Object.values(STARS), ...solarBodies];
+      for (const s of dots) {
+        const { alt, az } = toAltAz(s.ra, s.d);
+        if (alt < 0.01) continue;
+        const p = project(alt, az);
+        if (!p || p.y > skyH - 2) continue;
+        const r = Math.max(0.5, 3.4 - s.m * 0.85);
+        const alpha = Math.max(0.3, 1 - s.m * 0.12);
+        ctx.beginPath();
+        ctx.fillStyle = `rgba(220, 230, 255, ${alpha})`;
+        ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+    function resize() {
+      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      w = window.innerWidth; h = window.innerHeight;
+      canvas.width = Math.floor(w * dpr);
+      canvas.height = Math.floor(h * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      draw();
+    }
+    canvas.addEventListener("pointerdown", (e) => {
+      dragging = true; lastX = e.clientX; lastY = e.clientY;
+      canvas.classList.add("dragging");
+      canvas.setPointerCapture(e.pointerId);
+    });
+    canvas.addEventListener("pointermove", (e) => {
+      if (!dragging) return;
+      yaw = (yaw - (e.clientX - lastX) * 0.0045 + Math.PI * 2) % (Math.PI * 2);
+      pitch = Math.max(0.15, Math.min(1.25, pitch + (e.clientY - lastY) * 0.0035));
+      lastX = e.clientX; lastY = e.clientY;
+      draw();
+    });
+    const endDrag = (e) => { dragging = false; canvas.classList.remove("dragging"); try { canvas.releasePointerCapture(e.pointerId); } catch(_){} };
+    canvas.addEventListener("pointerup", endDrag);
+    canvas.addEventListener("pointercancel", endDrag);
+    window.addEventListener("resize", resize);
+    resize();
+    setInterval(() => { if (!dragging) draw(); }, 60000);
+
+    // — wheel hover effects per label —
+    const dimEl = document.getElementById("deviant-dim");
+    const blogLinkEl = document.getElementById("blog-link");
+
+    const CAT_GLYPHS = [
+      ["ᓚᘏᗢ",        1.46],
+      ["₍^. .^₎⟆",  1.05],
+      ["₍^. ̫.^₎⟆", 1.05],
+      [">^. .^<",    1.22],
+      ["⋆𑄝੭",       1.62],
+      ["(•˕ •マ╮ᕤ", 1.13],
+    ];
+
+    let bloomInterval = null;
+    let hoverSuspended = false;
+    let deviantTimer = null;
+    let glowLingerTimer = null;
+    const DEVIANT_DELAY = 2250;
+
+    function spawnBloom(glyphs, color, extraClass = "") {
+      const rect = whoWindow.getBoundingClientRect();
+      const cx = rect.left + rect.width / 2;
+      const cy = rect.top + rect.height / 2;
+      const leftBlock = 0.6;
+      let angle;
+      do { angle = Math.random() * Math.PI * 2 - Math.PI; }
+      while (Math.abs(angle) > Math.PI - leftBlock);
+      const baseDist = 90 + Math.random() * 70;
+      const sineBottom = document.querySelector("canvas.sine-wave").getBoundingClientRect().bottom;
+      const maxDown = Math.max(40, sineBottom - cy - 10);
+      const rawDy = Math.sin(angle) * baseDist;
+      const dy = rawDy > 0 ? Math.min(rawDy, maxDown) : rawDy;
+      const dx = Math.cos(angle) * baseDist;
+      const el = document.createElement("span");
+      el.className = "cat-bloom";
+      if (extraClass) el.classList.add(extraClass);
+      const [glyph, gsize] = glyphs[Math.floor(Math.random() * glyphs.length)];
+      el.textContent = glyph;
+      el.style.left = cx + "px";
+      el.style.top  = cy + "px";
+      el.style.setProperty("--dx", dx + "px");
+      el.style.setProperty("--dy", dy + "px");
+      el.style.setProperty("--rot0", (Math.random() * 60 - 30) + "deg");
+      el.style.setProperty("--rot1", (Math.random() * 40 - 20) + "deg");
+      el.style.setProperty("--rot2", (Math.random() * 80 - 40) + "deg");
+      el.style.fontSize = gsize + "rem";
+      el.style.color = color || `rgba(${180 + Math.floor(Math.random()*40)}, ${200 + Math.floor(Math.random()*30)}, 255, 0.85)`;
+      if (extraClass === "captcha-bloom") {
+        el.style.fontFamily = "\"IBM Plex Mono\", \"Consolas\", monospace";
+        el.style.fontWeight = Math.random() > 0.5 ? "700" : "400";
+        el.style.letterSpacing = (0.08 + Math.random() * 0.22) + "em";
+        el.style.filter = `blur(${(0.12 + Math.random() * 0.85).toFixed(2)}px)`;
+        el.style.fontStretch = "expanded";
+        el.style.transformOrigin = "center";
+        el.style.setProperty("--rot0", (Math.random() * 36 - 18) + "deg");
+        el.style.setProperty("--rot1", (Math.random() * 28 - 14) + "deg");
+        el.style.setProperty("--rot2", (Math.random() * 48 - 24) + "deg");
+      }
+      document.body.appendChild(el);
+      requestAnimationFrame(() => el.classList.add("pop"));
+      el.addEventListener("animationend", () => el.remove());
+    }
+
+    function startBloom(glyphs, color, interval = 400, extraClass = "") {
+      spawnBloom(glyphs, color, extraClass);
+      bloomInterval = setInterval(() => spawnBloom(glyphs, color, extraClass), interval);
+    }
+
+    function stopBloom() {
+      clearInterval(bloomInterval);
+      bloomInterval = null;
+    }
+
+    function startDeviantEffect() {
+      clearTimeout(glowLingerTimer);
+      glowLingerTimer = null;
+      dimEl.classList.remove("snap");
+      blogLinkEl.classList.remove("snap");
+      dimEl.classList.add("active");
+      document.body.classList.add("deviant-hover");
+      blogLinkEl.classList.add("blog-glow");
+    }
+
+    function stopDeviantEffect(immediate) {
+      clearTimeout(deviantTimer);
+      deviantTimer = null;
+      clearTimeout(glowLingerTimer);
+      glowLingerTimer = null;
+      const hadGlow = blogLinkEl.classList.contains("blog-glow");
+      dimEl.classList.remove("active");
+      document.body.classList.remove("deviant-hover");
+      if (immediate || !hadGlow) {
+        dimEl.classList.add("snap");
+        blogLinkEl.classList.add("snap");
+        blogLinkEl.classList.remove("blog-glow");
+        dimEl.offsetWidth;
+        dimEl.classList.remove("snap");
+        blogLinkEl.classList.remove("snap");
+      } else {
+        glowLingerTimer = setTimeout(() => {
+          blogLinkEl.classList.remove("blog-glow");
+          glowLingerTimer = null;
+        }, 3000);
+      }
+    }
+
+    function onWheelEnter() {
+      clearTimeout(glowLingerTimer);
+      glowLingerTimer = null;
+      const label = labels[visitor];
+      if (label === "just a bit curious") {
+        startBloom(CAT_GLYPHS);
+      } else if (label === "my deviant reader") {
+        if (blogLinkEl.classList.contains("blog-glow")) startDeviantEffect();
+        else deviantTimer = setTimeout(startDeviantEffect, DEVIANT_DELAY);
+      }
+    }
+
+    function onWheelLeave(immediate) {
+      stopBloom();
+      stopDeviantEffect(immediate);
+    }
+
+    whoWindow.addEventListener("mouseenter", () => {
+      if (hoverSuspended || wheelBusy) return;
+      onWheelEnter();
+    });
+    whoWindow.addEventListener("mouseleave", () => {
+      hoverSuspended = false;
+      onWheelLeave(false);
+    });
+    whoReel.addEventListener("transitionend", () => {
+      if (wheelBusy) onWheelLeave(true);
+    });
+
+  </script>
+</body>
+</html>

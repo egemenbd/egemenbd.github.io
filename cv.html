@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/png" href="assets/logo.png">
+  <title>CV · Egemen Bahadır Dumludağ</title>
+  <script>document.documentElement.dataset.theme = localStorage.getItem("cv-theme") || "light";</script>
+  <style>
+    html, body { background: var(--bg); }
+    :root, html[data-theme="light"] {
+      --bg: #f3eef9;
+      --ink: #1c1b18;
+      --mute: #5f5a52;
+      --rule: #d4cec3;
+      --accent: #2c3a78;
+      --btn: #1c1b18;
+      --btn-bg: transparent;
+      --btn-border: #8a847a;
+    }
+    html[data-theme="dark"] {
+      --bg: #07080c;
+      --ink: #f3eef9;
+      --mute: #a89fb4;
+      --rule: #3a3a42;
+      --accent: #b8b0ff;
+      --btn: #f3eef9;
+      --btn-bg: transparent;
+      --btn-border: #5c564c;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Georgia, "Times New Roman", serif;
+      background: var(--bg);
+      color: var(--ink);
+    }
+    .wrap {
+      width: min(52rem, 100%);
+      margin: 0 auto;
+      padding: 1.1rem 1.4rem 3.2rem;
+    }
+    .chrome {
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.5rem;
+      margin-bottom: 1.6rem;
+      font-family: "IBM Plex Mono", "Consolas", monospace;
+    }
+    a.btn, button.btn {
+      display: inline-block;
+      padding: 0.4rem 0.7rem;
+      font: inherit;
+      font-size: 0.76rem;
+      letter-spacing: 0.05em;
+      color: var(--btn);
+      background: var(--btn-bg);
+      border: 1px solid var(--btn-border);
+      cursor: pointer;
+      text-decoration: none;
+    }
+    a.btn:hover, button.btn:hover { border-color: var(--ink); }
+    a.btn.primary { border-color: var(--accent); color: var(--accent); }
+    .sheet a { color: var(--accent); }
+
+    .sheet { padding: 0; }
+    header.cv {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 1rem 2rem;
+      align-items: end;
+      padding-bottom: 1.1rem;
+      border-bottom: 2px solid var(--ink);
+    }
+    h1 {
+      margin: 0 0 0.25rem;
+      font-size: 1.85rem;
+      font-weight: 700;
+      letter-spacing: 0.01em;
+      line-height: 1.15;
+    }
+    .headline {
+      margin: 0;
+      color: var(--mute);
+      font-size: 0.95rem;
+    }
+    .contact {
+      margin: 0;
+      text-align: right;
+      font-size: 0.82rem;
+      line-height: 1.55;
+      color: var(--mute);
+    }
+    .contact a { color: var(--accent); text-decoration: none; }
+    .contact a:hover { text-decoration: underline; }
+
+    h2 {
+      margin: 1.55rem 0 0.7rem;
+      padding-bottom: 0.28rem;
+      font-family: "IBM Plex Mono", "Consolas", monospace;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--accent);
+      border-bottom: 1px solid var(--rule);
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 7.4rem 1fr;
+      gap: 0.35rem 1.15rem;
+      margin: 0 0 1.05rem;
+    }
+    .when {
+      margin: 0.18rem 0 0;
+      font-family: "IBM Plex Mono", "Consolas", monospace;
+      font-size: 0.72rem;
+      line-height: 1.4;
+      color: var(--mute);
+    }
+    .row h3 {
+      margin: 0 0 0.12rem;
+      font-size: 1.02rem;
+      font-weight: 700;
+    }
+    .org {
+      margin: 0 0 0.4rem;
+      color: var(--mute);
+      font-size: 0.9rem;
+    }
+    .row p, .row li {
+      margin: 0 0 0.32rem;
+      font-size: 0.92rem;
+      line-height: 1.5;
+    }
+    .row ul {
+      margin: 0;
+      padding-left: 1.1rem;
+    }
+    .edu .org { margin-bottom: 0.15rem; }
+    .compact { margin-bottom: 0.7rem; }
+    .nested {
+      margin: 0.85rem 0 0;
+      padding: 0.7rem 0 0 0.95rem;
+      border-left: 2px solid var(--rule);
+    }
+    .nested h3 { font-size: 0.96rem; }
+
+    @media (max-width: 640px) {
+      header.cv, .row { grid-template-columns: 1fr; }
+      .contact { text-align: left; }
+      .when { margin: 0 0 0.2rem; }
+    }
+    @media print {
+      .chrome { display: none; }
+      body { background: #fff; color: #111; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+  <div class="chrome">
+    <button type="button" class="btn" id="theme">dark</button>
+    <a class="btn primary" href="assets/egemen-dumludag-cv.pdf" download="Egemen-Dumludag-CV.pdf">download pdf</a>
+    <a class="btn" href="index.html">about</a>
+  </div>
+
+  <article class="sheet">
+    <header class="cv">
+      <div>
+        <h1>Egemen Bahadır Dumludağ</h1>
+        <p class="headline">In-house lawyer · employment law · GDPR · legal engineering</p>
+      </div>
+      <p class="contact">
+        Çankaya Mh. Atatürk Blv. No.144/146<br>
+        Çankaya / Ankara<br>
+        <a href="tel:+905414210911">+90 541 421 09 11</a><br>
+        <a href="mailto:egemenbd@protonmail.com">egemenbd@protonmail.com</a>
+      </p>
+    </header>
+
+    <h2>Experience</h2>
+    <div class="row">
+      <p class="when">26.10.2020 —<br>present</p>
+      <div>
+        <h3>Lawyer</h3>
+        <p class="org">Rönesans Holding A.Ş.</p>
+        <ul>
+          <li>Advise on employment law and GDPR compliance, including employment documentation, HR policies and procedures, and employee relations; serve as rapporteur to the Disciplinary Board.</li>
+          <li>Represent the company in employment (and OHS) disputes, mediations, and litigation, including preparing petitions, submissions, and other court filings and attending hearings.</li>
+          <li>Prepare litigation, dispute, and legal-risk assessments and reports, supporting management in evaluating and mitigating legal risks.</li>
+          <li>Draft, review, and negotiate commercial contracts, including service provision, procurement, software licensing, confidentiality, and rental agreements.</li>
+        </ul>
+        <div class="nested">
+          <h3>Legal Automation</h3>
+          <p class="org">Python · RPA · REXA 2021</p>
+          <p>Built a Python RPA toolkit to take repetitive legal work off the team, delivering an effective 30% efficiency increase; awarded REXA 2021 as most innovative employee.</p>
+        </div>
+      </div>
+    </div>
+
+    <h2>Education</h2>
+    <div class="row edu compact">
+      <p class="when">Spring 2024</p>
+      <div>
+        <h3>Master of Laws, Philosophy of Law</h3>
+        <p class="org">Ankara University · 3.71 / 4.00</p>
+        <p>Thesis: <a href="assets/egemen-dumludag-llm-thesis.pdf"><em>Legal Realism’s Renaissance: Legal Decision Making with AI</em></a> — AI methods for predicting legal decisions, and whether they can sit inside legal decision-making as Legal Realism understands it.</p>
+      </div>
+    </div>
+    <div class="row edu compact">
+      <p class="when">Fall 2020</p>
+      <div>
+        <h3>Bachelor of Laws</h3>
+        <p class="org">TOBB University of Economics and Technology · double major</p>
+      </div>
+    </div>
+    <div class="row edu compact">
+      <p class="when">Summer 2019</p>
+      <div>
+        <h3>Bachelor of Arts, English Language and Literature</h3>
+        <p class="org">TOBB University of Economics and Technology · 3.71 / 4.00 · first rank in class</p>
+      </div>
+    </div>
+
+    <h2>Awards</h2>
+    <div class="row compact">
+      <p class="when">2021</p>
+      <div>
+        <h3>REXA — Innovation</h3>
+        <p class="org">Rönesans Holding Renaissance Excellence Award — best innovative practice group-wide, for Legal Automation.</p>
+      </div>
+    </div>
+    <div class="row compact">
+      <p class="when">2016</p>
+      <div>
+        <h3>Microsoft Imagine Cup, Turkey Finals — 3rd place</h3>
+        <p class="org">E-book project for smartboards.</p>
+      </div>
+    </div>
+
+    <h2>Conferences</h2>
+    <div class="row compact">
+      <p class="when">2022</p>
+      <div>
+        <h3>HFSA 30</h3>
+        <p class="org"><em>Yapay Zekâ Etiğine İnsan Temelli Yaklaşımın bir Eleştirisi</em> [A Criticism of the Human-Centered Approach to AI Ethics]. <em>HFSA 30: Hukuka Felsefi ve Sosyolojik Bakışlar – X Sempozyumu</em>. İstanbul Barosu Yayınları, 2024.</p>
+      </div>
+    </div>
+    <div class="row compact">
+      <p class="when">2021</p>
+      <div>
+        <h3>New Voices IV</h3>
+        <p class="org"><em>Sustainable Culture: A Renewable Solution with Faërie</em></p>
+      </div>
+    </div>
+    <div class="row compact">
+      <p class="when">2017</p>
+      <div>
+        <h3>New Voices III</h3>
+        <p class="org"><em>A Closure to Prophecies: Decline of Science Fiction</em></p>
+      </div>
+    </div>
+
+    <h2>Internships</h2>
+    <div class="row compact">
+      <p class="when">May–Jun 2019</p>
+      <div>
+        <h3>Co-op intern</h3>
+        <p class="org">TOBB University of Economics and Technology — English-language student support; ELT research, observation, and teaching with a mentor.</p>
+      </div>
+    </div>
+    <div class="row compact">
+      <p class="when">Jan 2018 —<br>Apr 2019</p>
+      <div>
+        <h3>Co-op intern</h3>
+        <p class="org">Union of Chambers and Commodity Exchanges of Türkiye — replies to chamber inquiries; Excel automation for permit applications; daily legislation summaries; reports on bills and bylaws.</p>
+      </div>
+    </div>
+    <div class="row compact">
+      <p class="when">May 2017 —<br>Aug 2018</p>
+      <div>
+        <h3>Co-op intern</h3>
+        <p class="org">EnglishCentral — GDPR reports, content translation, and a translation workflow in Google Sheets.</p>
+      </div>
+    </div>
+  </article>
+  </div>
+  <script>
+    const themeBtn = document.getElementById("theme");
+    const apply = (t) => {
+      document.documentElement.dataset.theme = t;
+      localStorage.setItem("cv-theme", t);
+      themeBtn.textContent = t === "light" ? "dark" : "light";
+    };
+    apply(document.documentElement.dataset.theme || "light");
+    themeBtn.addEventListener("click", () => {
+      apply(document.documentElement.dataset.theme === "dark" ? "light" : "dark");
+    });
+  </script>
+</body>
+</html>
