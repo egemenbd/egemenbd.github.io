@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-cat="mare" data-file="hart-penumbra.html">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -53,6 +53,8 @@
       padding: 1.5rem 1rem 2rem 1.25rem;
       background: var(--rail);
       border-right: 1px solid var(--rail-line);
+      overflow-y: auto;
+      max-height: 100vh;
     }
     aside .brand {
       display: block;
@@ -248,12 +250,7 @@
     <aside>
       <a class="brand" href="blog.html">blog</a>
       <h2>mare</h2>
-      <ol>
-        <li>
-          <time datetime="2026-08-18">2026-08-18</time>
-          <a class="here" href="hart-penumbra.html">gölge ve gerçeğin göstergeleri</a>
-        </li>
-      </ol>
+      <ol id="rail"></ol>
     </aside>
 
     <article>
@@ -553,6 +550,8 @@
       <p class="back"><a href="blog.html">→ blog</a></p>
     </article>
   </div>
+  <script src="entries.js"></script>
+  <script>fillRail();</script>
   <script>
     /** Cycle dim → normal → bright; icon shown via CSS + data-bright. */
     (function () {
