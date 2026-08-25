@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en" data-cat="serra" data-file="sewing-machine.html">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>sewing machine — serra</title>
+  <style>
+    :root{--ink:#d2dbd4;--paper:#0a1410;--heading:#b0bdb4;--mute:#7d8c84;--rail:#08110d;--rail-line:rgba(125,140,132,.18);--code-bg:#0c1612}html[data-bright=dim]{--ink:#a8b5ad;--paper:#060c09;--heading:#8f9c94;--mute:#66756d;--rail:#050a08;--code-bg:#08110d}html[data-bright=bright]{--ink:#e4ebe6;--paper:#121c16;--heading:#c5d0c8;--mute:#93a399;--rail:#0e1712;--code-bg:#152019;--rail-line:rgba(147,163,153,.22)}
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; min-height: 100vh;
+      font-family: "IBM Plex Mono", "Consolas", "Courier New", monospace;
+      font-size: 15px; line-height: 1.7;
+      color: var(--ink); background: var(--paper);
+    }
+    .layout { display: grid; grid-template-columns: 13.5rem 1fr; min-height: 100vh; }
+    aside { padding: 1.5rem 1rem 2rem 1.25rem; background: var(--rail); border-right: 1px solid var(--rail-line); overflow-y: auto; max-height: 100vh; }
+    aside .brand { display: block; margin-bottom: 1.25rem; font-size: 0.72rem; color: var(--mute); text-decoration: none; opacity: 0.85; }
+    aside .brand:hover { color: var(--heading); opacity: 1; }
+    aside h2 { margin: 0 0 0.85rem; font-size: 0.68rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--mute); }
+    aside ol { list-style: none; margin: 0; padding: 0; }
+    aside li { margin: 0 0 0.7rem; }
+    aside a { color: var(--mute); text-decoration: none; font-size: 0.75rem; line-height: 1.4; }
+    aside a:hover { color: var(--ink); }
+    aside a.here { color: var(--ink); font-weight: 600; }
+    aside time { display: block; font-size: 0.65rem; color: var(--mute); opacity: 0.75; }
+    article { padding: 2rem 3.5rem 4rem 2rem; }
+    .topbar { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; margin: 0 0 1.5rem; }
+    .crumb { margin: 0; font-size: 0.75rem; color: var(--mute); }
+    .crumb a { color: var(--heading); }
+    .bright-btn { flex-shrink: 0; width: 2.4rem; height: 2.4rem; padding: 0.3rem; display: inline-flex; align-items: center; justify-content: center; color: var(--mute); background: transparent; border: none; cursor: pointer; }
+    .bright-btn:hover { color: var(--ink); }
+    .bright-btn svg { width: 100%; height: 100%; display: none; stroke: currentColor; fill: none; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+    html:not([data-bright]) .bright-btn svg[data-level="normal"],
+    html[data-bright="dim"] .bright-btn svg[data-level="dim"],
+    html[data-bright="bright"] .bright-btn svg[data-level="bright"] { display: block; }
+    header h1 { margin: 0 0 0.4rem; font-size: 1.25rem; line-height: 1.35; letter-spacing: 0.02em; }
+    header .meta { margin: 0 0 2rem; font-size: 0.8rem; color: var(--mute); }
+    .body p { margin: 0 0 1.15rem; }
+    .body a { color: var(--heading); }
+    .body pre { margin: 1.25rem 0; padding: 0.9rem 1rem; overflow-x: auto; background: var(--code-bg); border-left: 2px solid var(--rail-line); font-size: 0.84rem; }
+    .body .poem { margin: 1.5rem 0; padding-left: 0.25rem; white-space: pre-wrap; color: var(--mute); }
+    .body blockquote { margin: 1.25rem 0; padding: 0.2rem 0 0.2rem 1rem; border-left: 2px solid var(--rail-line); color: var(--mute); }
+    .body h2 { margin: 2rem 0 0.75rem; font-size: 0.95rem; font-weight: 600; color: var(--heading); }
+    .body h3 { margin: 1.4rem 0 0.6rem; font-size: 0.88rem; font-weight: 600; color: var(--heading); }
+    .body .caption { font-size: 0.85rem; font-style: italic; color: var(--mute); }
+    .body sup.fn { font-size: 0.7em; line-height: 0; }
+    .body sup.fn a { color: var(--heading); text-decoration: none; }
+    .body .footnotes { list-style: decimal; margin: 0 0 1.6rem; padding-left: 1.4rem; font-size: 0.82rem; color: var(--mute); }
+    .body .footnotes li { margin: 0 0 0.55rem; }
+    .body .footnotes .backref { color: var(--heading); text-decoration: none; }
+    .body .script { margin: 0.35rem 0 1.25rem; }
+    .body .script img { display: block; width: 50%; max-width: 16rem; height: auto; filter: invert(1); }
+    .body .script figcaption { margin-top: 0.5rem; font-size: 0.85rem; font-style: italic; color: var(--mute); white-space: nowrap; }
+    .body .refs p { padding-left: 1.5em; text-indent: -1.5em; }
+    .back { margin-top: 2.5rem; font-size: 0.75rem; }
+    .back a { color: var(--heading); }
+    @media (max-width: 720px) {
+      .layout { grid-template-columns: 1fr; }
+      aside { border-right: none; border-bottom: 1px solid var(--rail-line); }
+      article { padding: 1.5rem 1.25rem 3rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <aside>
+      <a class="brand" href="blog.html">blog</a>
+      <h2>serra</h2>
+      <ol id="rail"></ol>
+    </aside>
+    <article>
+      <div class="topbar">
+        <p class="crumb"><a href="blog.html">blog</a> / serra</p>
+        <button type="button" class="bright-btn" id="bright" aria-label="Reading brightness">
+    <svg data-level="dim" viewBox="0 0 64 64" aria-hidden="true">
+      <rect x="22" y="14" width="20" height="40" rx="2" fill="rgba(143,168,152,0.12)"></rect>
+      <rect x="28" y="8" width="8" height="6" rx="1"></rect>
+      <line x1="22" y1="24" x2="42" y2="24"></line>
+      <text x="32" y="40" text-anchor="middle" fill="currentColor" stroke="none" font-size="9" font-family="Consolas,monospace">AA</text>
+      <line x1="32" y1="28" x2="32" y2="34" stroke="#d4b07a"></line>
+      <line x1="29" y1="31" x2="35" y2="31" stroke="#d4b07a"></line>
+    </svg>
+    <svg data-level="normal" viewBox="0 0 64 64" aria-hidden="true">
+      <rect x="18" y="18" width="28" height="34" rx="2" fill="rgba(143,168,152,0.12)"></rect>
+      <rect x="22" y="12" width="8" height="6" rx="1"></rect>
+      <rect x="34" y="12" width="8" height="6" rx="1"></rect>
+      <text x="32" y="40" text-anchor="middle" fill="currentColor" stroke="none" font-size="10" font-family="Consolas,monospace">9V</text>
+    </svg>
+    <svg data-level="bright" viewBox="0 0 64 64" aria-hidden="true">
+      <rect x="10" y="22" width="44" height="28" rx="2" fill="rgba(143,168,152,0.12)"></rect>
+      <rect x="16" y="16" width="10" height="6" rx="1"></rect>
+      <rect x="38" y="16" width="10" height="6" rx="1"></rect>
+      <line x1="21" y1="28" x2="21" y2="36" stroke="#d4b07a"></line>
+      <line x1="17" y1="32" x2="25" y2="32" stroke="#d4b07a"></line>
+      <text x="32" y="40" text-anchor="middle" fill="currentColor" stroke="none" font-size="8" font-family="Consolas,monospace">12V</text>
+    </svg>
+  </button>
+      </div>
+      <header>
+        <h1>Sewing Machine</h1>
+        <p class="meta">2026-08-25 · serra · egemen</p>
+      </header>
+      <div class="body">
+        <p>Let us enjoy this nightmare together, please<br>I know I'm being obtuse by not taking the hint<br>that you are kindly trying to refuse my offer<br>but the tears have become too much, I'm afraid.</p><p>Would you happen to know how to sew back a smile?<br>It is no simple task. You have to have the cloth laid:<br>then<br>&nbsp; &nbsp; &nbsp; poke in. poke out. poke in. poke out.<br>An eternity reserved only for the most vile.</p><p>I have brought this upon myself. Well deserved!<br>Your path is either straight to death; or, curved<br>towards Love's invite:&nbsp;where life can begin anew<br>in a sweet little bite&nbsp;or their cup of the brew...</p><p>though, to survive is not the excuse to love<br>to love itself is reason to snooze the alarms<br>for Sun to come around, for a Muse to inspire<br>reason inside a wandering, blabbering corpse.</p><p>hear the d minor? go ahead. poke in, poke out.<br>The machine only has one purpose for this fever.<br>be wound. be loud. sew a smile on the cloth.</p><p>A shroud is a misfit, a rose shouldn't wither<br>but punishment catches on and I have to suffer:<br>my needle pointing not in your direction.</p>
+      </div>
+      <p class="back"><a href="blog.html">→ blog</a></p>
+    </article>
+  </div>
+  <script src="entries.js"></script>
+  <script>fillRail();</script>
+  <script>
+    (function () {
+      const KEY = "terrazza-bright";
+      const levels = ["dim", "normal", "bright"];
+      const names = { dim: "aa cell", normal: "9v cell", bright: "car battery" };
+      const btn = document.getElementById("bright");
+      function apply(level) {
+        if (level === "normal") document.documentElement.removeAttribute("data-bright");
+        else document.documentElement.setAttribute("data-bright", level);
+        btn.setAttribute("aria-label", "Reading brightness: " + names[level]);
+        btn.title = names[level];
+        try { localStorage.setItem(KEY, level); } catch (_) {}
+      }
+      let level = "normal";
+      try {
+        const saved = localStorage.getItem(KEY);
+        if (saved && levels.indexOf(saved) !== -1) level = saved;
+        else if (window.matchMedia("(prefers-color-scheme: light)").matches) level = "bright";
+      } catch (_) {}
+      apply(level);
+      btn.addEventListener("click", function () {
+        level = levels[(levels.indexOf(level) + 1) % levels.length];
+        apply(level);
+      });
+    })();
+  </script>
+</body>
+</html>

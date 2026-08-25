@@ -1,4 +1,5 @@
 var ENTRIES = [
+  { cat: "serra", date: "2026-08-25", file: "sewing-machine.html", title: "sewing machine" },
   { cat: "serra", date: "2026-08-18", file: "original-sense.html", title: "original sense" },
   { cat: "terra", date: "2026-08-18", file: "two-days.html", title: "two days" },
   { cat: "mare", date: "2026-08-18", file: "hart-penumbra.html", title: "gölge ve gerçeğin göstergeleri" }
