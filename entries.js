@@ -22,11 +22,4 @@ function fillRail() {
   }).join("");
 }
 
-(function () {
-  function run() { fillRail(); }
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", run);
-  } else {
-    run();
-  }
-})();
+fillRail();
