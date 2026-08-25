@@ -21,3 +21,12 @@ function fillRail() {
       "<a" + cur + " href=\"" + e.file + "\">" + e.title.replace(/</g, "&lt;") + "</a></li>";
   }).join("");
 }
+
+(function () {
+  function run() { fillRail(); }
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", run);
+  } else {
+    run();
+  }
+})();
