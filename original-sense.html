@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-cat="serra" data-file="original-sense.html">
+<html lang="en" data-cat="serra" data-file="original-sense.html" data-lines="preserve">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -55,6 +55,7 @@
       border-right: 1px solid var(--rail-line);
       overflow-y: auto;
       max-height: 100vh;
+      min-width: 0;
     }
     aside .brand {
       display: block;
@@ -98,6 +99,7 @@
     }
     article {
       padding: 2rem 3.5rem 4rem 2rem;
+      min-width: 0;
     }
     .topbar {
       display: flex;
@@ -148,12 +150,18 @@
       font-size: 1.25rem;
       line-height: 1.35;
       letter-spacing: 0.02em;
+      overflow-wrap: break-word;
     }
     header .meta {
       margin: 0 0 2rem;
       font-size: 0.8rem;
       color: var(--mute);
     }
+    .body { overflow-wrap: break-word; }
+    html[data-lines="preserve"] .body p,
+    html[data-lines="preserve"] .body .poem { white-space: pre-wrap; }
+    html[data-lines="wrap"] .body p,
+    html[data-lines="wrap"] .body .poem { white-space: normal; }
     .body p { margin: 0 0 1.15rem; }
     .body a { color: var(--heading); }
     .body pre {
@@ -167,8 +175,6 @@
     .body .poem {
       margin: 1.5rem 0;
       padding-left: 0.25rem;
-      white-space: pre-wrap;
-      color: var(--mute);
     }
     .body blockquote {
       margin: 1.25rem 0;

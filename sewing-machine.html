@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-cat="serra" data-file="sewing-machine.html">
+<html lang="en" data-cat="serra" data-file="sewing-machine.html" data-lines="preserve">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -14,7 +14,7 @@
       color: var(--ink); background: var(--paper);
     }
     .layout { display: grid; grid-template-columns: 13.5rem 1fr; min-height: 100vh; }
-    aside { padding: 1.5rem 1rem 2rem 1.25rem; background: var(--rail); border-right: 1px solid var(--rail-line); overflow-y: auto; max-height: 100vh; }
+    aside { padding: 1.5rem 1rem 2rem 1.25rem; background: var(--rail); border-right: 1px solid var(--rail-line); overflow-y: auto; max-height: 100vh; min-width: 0; }
     aside .brand { display: block; margin-bottom: 1.25rem; font-size: 0.72rem; color: var(--mute); text-decoration: none; opacity: 0.85; }
     aside .brand:hover { color: var(--heading); opacity: 1; }
     aside h2 { margin: 0 0 0.85rem; font-size: 0.68rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--mute); }
@@ -24,7 +24,7 @@
     aside a:hover { color: var(--ink); }
     aside a.here { color: var(--ink); font-weight: 600; }
     aside time { display: block; font-size: 0.65rem; color: var(--mute); opacity: 0.75; }
-    article { padding: 2rem 3.5rem 4rem 2rem; }
+    article { padding: 2rem 3.5rem 4rem 2rem; min-width: 0; }
     .topbar { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; margin: 0 0 1.5rem; }
     .crumb { margin: 0; font-size: 0.75rem; color: var(--mute); }
     .crumb a { color: var(--heading); }
@@ -34,12 +34,17 @@
     html:not([data-bright]) .bright-btn svg[data-level="normal"],
     html[data-bright="dim"] .bright-btn svg[data-level="dim"],
     html[data-bright="bright"] .bright-btn svg[data-level="bright"] { display: block; }
-    header h1 { margin: 0 0 0.4rem; font-size: 1.25rem; line-height: 1.35; letter-spacing: 0.02em; }
+    header h1 { margin: 0 0 0.4rem; font-size: 1.25rem; line-height: 1.35; letter-spacing: 0.02em; overflow-wrap: break-word; }
     header .meta { margin: 0 0 2rem; font-size: 0.8rem; color: var(--mute); }
+    .body { overflow-wrap: break-word; }
+    html[data-lines="preserve"] .body p,
+    html[data-lines="preserve"] .body .poem { white-space: pre-wrap; }
+    html[data-lines="wrap"] .body p,
+    html[data-lines="wrap"] .body .poem { white-space: normal; }
     .body p { margin: 0 0 1.15rem; }
     .body a { color: var(--heading); }
     .body pre { margin: 1.25rem 0; padding: 0.9rem 1rem; overflow-x: auto; background: var(--code-bg); border-left: 2px solid var(--rail-line); font-size: 0.84rem; }
-    .body .poem { margin: 1.5rem 0; padding-left: 0.25rem; white-space: pre-wrap; color: var(--mute); }
+    .body .poem { margin: 1.5rem 0; padding-left: 0.25rem; }
     .body blockquote { margin: 1.25rem 0; padding: 0.2rem 0 0.2rem 1rem; border-left: 2px solid var(--rail-line); color: var(--mute); }
     .body h2 { margin: 2rem 0 0.75rem; font-size: 0.95rem; font-weight: 600; color: var(--heading); }
     .body h3 { margin: 1.4rem 0 0.6rem; font-size: 0.88rem; font-weight: 600; color: var(--heading); }
@@ -51,14 +56,17 @@
     .body .footnotes .backref { color: var(--heading); text-decoration: none; }
     .body .script { margin: 0.35rem 0 1.25rem; }
     .body .script img { display: block; width: 50%; max-width: 16rem; height: auto; filter: invert(1); }
-    .body .script figcaption { margin-top: 0.5rem; font-size: 0.85rem; font-style: italic; color: var(--mute); white-space: nowrap; }
-    .body .refs p { padding-left: 1.5em; text-indent: -1.5em; }
+    .body .script figcaption { margin-top: 0.5rem; font-size: 0.85rem; font-style: italic; color: var(--mute); }
+    .body .refs p { padding-left: 1.5em; text-indent: -1.5em; overflow-wrap: anywhere; }
     .back { margin-top: 2.5rem; font-size: 0.75rem; }
     .back a { color: var(--heading); }
     @media (max-width: 720px) {
       .layout { grid-template-columns: 1fr; }
       aside { border-right: none; border-bottom: 1px solid var(--rail-line); }
       article { padding: 1.5rem 1.25rem 3rem; }
+    }
+    @media (min-width: 721px) {
+      .body .script figcaption { white-space: nowrap; }
     }
   </style>
 </head>
