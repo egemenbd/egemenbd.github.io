@@ -38,7 +38,12 @@
     header .meta { margin: 0 0 2rem; font-size: 0.8rem; color: var(--mute); }
     .body { overflow-wrap: break-word; }
     html[data-lines="preserve"] .body p,
-    html[data-lines="preserve"] .body .poem { white-space: pre-wrap; }
+    html[data-lines="preserve"] .body .poem {
+      white-space: pre;
+      overflow-wrap: normal;
+      word-break: normal;
+    }
+    html[data-lines="preserve"] .body { overflow-x: auto; }
     html[data-lines="wrap"] .body p,
     html[data-lines="wrap"] .body .poem { white-space: normal; }
     .body p { margin: 0 0 1.15rem; }
