@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en" data-cat="terra" data-file="word.html" data-lines="wrap">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>word — terra</title>
+  <style>
+    :root{--ink:#d4ccc2;--paper:#0f0c09;--heading:#b4a898;--mute:#8a7e72;--rail:#0c0a08;--rail-line:rgba(138,126,114,.18);--code-bg:#12100c}html[data-bright=dim]{--ink:#aea49a;--paper:#0a0806;--heading:#95897c;--mute:#6e645a;--rail:#080604;--code-bg:#0c0a08}html[data-bright=bright]{--ink:#e8e0d6;--paper:#1a1510;--heading:#cbbfb0;--mute:#a09486;--rail:#14110d;--code-bg:#1e1914;--rail-line:rgba(160,148,134,.22)}
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; min-height: 100vh;
+      font-family: "IBM Plex Mono", "Consolas", "Courier New", monospace;
+      font-size: 15px; line-height: 1.7;
+      color: var(--ink); background: var(--paper);
+    }
+    .layout { display: grid; grid-template-columns: 13.5rem 1fr; min-height: 100vh; }
+    aside { padding: 1.5rem 1rem 2rem 1.25rem; background: var(--rail); border-right: 1px solid var(--rail-line); overflow-y: auto; max-height: 100vh; min-width: 0; }
+    aside .brand { display: block; margin-bottom: 1.25rem; font-size: 0.72rem; color: var(--mute); text-decoration: none; opacity: 0.85; }
+    aside .brand:hover { color: var(--heading); opacity: 1; }
+    aside h2 { margin: 0 0 0.85rem; font-size: 0.68rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--mute); }
+    aside ol { list-style: none; margin: 0; padding: 0; }
+    aside li { margin: 0 0 0.7rem; }
+    aside a { color: var(--mute); text-decoration: none; font-size: 0.75rem; line-height: 1.4; }
+    aside a:hover { color: var(--ink); }
+    aside a.here { color: var(--ink); font-weight: 600; }
+    aside time { display: block; font-size: 0.65rem; color: var(--mute); opacity: 0.75; }
+    article { padding: 2rem 3.5rem 4rem 2rem; min-width: 0; }
+    .topbar { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; margin: 0 0 1.5rem; }
+    .crumb { margin: 0; font-size: 0.75rem; color: var(--mute); }
+    .crumb a { color: var(--heading); }
+    .bright-btn { flex-shrink: 0; width: 2.4rem; height: 2.4rem; padding: 0.3rem; display: inline-flex; align-items: center; justify-content: center; color: var(--mute); background: transparent; border: none; cursor: pointer; }
+    .bright-btn:hover { color: var(--ink); }
+    .bright-btn svg { width: 100%; height: 100%; display: none; stroke: currentColor; fill: none; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+    html:not([data-bright]) .bright-btn svg[data-level="normal"],
+    html[data-bright="dim"] .bright-btn svg[data-level="dim"],
+    html[data-bright="bright"] .bright-btn svg[data-level="bright"] { display: block; }
+    header h1 { margin: 0 0 0.4rem; font-size: 1.25rem; line-height: 1.35; letter-spacing: 0.02em; overflow-wrap: break-word; }
+    header .meta { margin: 0 0 2rem; font-size: 0.8rem; color: var(--mute); }
+    .body { overflow-wrap: break-word; }
+    html[data-lines="preserve"] .body p,
+    html[data-lines="preserve"] .body .poem {
+      white-space: pre;
+      overflow-wrap: normal;
+      word-break: normal;
+    }
+    html[data-lines="preserve"] .body { overflow-x: auto; }
+    html[data-lines="wrap"] .body p,
+    html[data-lines="wrap"] .body .poem { white-space: normal; }
+    .body p { margin: 0 0 1.15rem; }
+    .body a { color: var(--heading); }
+    .body pre { margin: 1.25rem 0; padding: 0.9rem 1rem; overflow-x: auto; background: var(--code-bg); border-left: 2px solid var(--rail-line); font-size: 0.84rem; }
+    .body .poem { margin: 1.5rem 0; padding-left: 0.25rem; }
+    .body blockquote { margin: 1.25rem 0; padding: 0.2rem 0 0.2rem 1rem; border-left: 2px solid var(--rail-line); color: var(--mute); }
+    .body h2 { margin: 2rem 0 0.75rem; font-size: 0.95rem; font-weight: 600; color: var(--heading); }
+    .body h3 { margin: 1.4rem 0 0.6rem; font-size: 0.88rem; font-weight: 600; color: var(--heading); }
+    .body .caption { font-size: 0.85rem; font-style: italic; color: var(--mute); }
+    .body ul, .body ol:not(.footnotes) { margin: 0 0 1.15rem; padding-left: 1.4rem; }
+    .body ul { list-style: disc; }
+    .body ol:not(.footnotes) { list-style: decimal; }
+    .body li { margin: 0 0 0.35rem; }
+    .body .footnotes li { margin: 0 0 0.55rem; }
+    .body sup.fn { font-size: 0.7em; line-height: 0; }
+    .body sup.fn a { color: var(--heading); text-decoration: none; }
+    .body .footnotes { list-style: decimal; margin: 0 0 1.6rem; padding-left: 1.4rem; font-size: 0.82rem; color: var(--mute); }
+    .body .footnotes .backref { color: var(--heading); text-decoration: none; }
+    .body .script { margin: 0.35rem 0 1.25rem; }
+    .body .script img { display: block; width: 50%; max-width: 16rem; height: auto; filter: invert(1); }
+    .body .script figcaption { margin-top: 0.5rem; font-size: 0.85rem; font-style: italic; color: var(--mute); }
+    .body .refs p { padding-left: 1.5em; text-indent: -1.5em; overflow-wrap: anywhere; }
+    .back { margin-top: 2.5rem; font-size: 0.75rem; }
+    .back a { color: var(--heading); }
+    @media (max-width: 720px) {
+      .layout { grid-template-columns: 1fr; }
+      aside { border-right: none; border-bottom: 1px solid var(--rail-line); }
+      article { padding: 1.5rem 1.25rem 3rem; }
+    }
+    @media (min-width: 721px) {
+      .body .script figcaption { white-space: nowrap; }
+    }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <aside>
+      <a class="brand" href="blog.html">blog</a>
+      <h2>terra</h2>
+      <ol id="rail"></ol>
+    </aside>
+    <article>
+      <div class="topbar">
+        <p class="crumb"><a href="blog.html">blog</a> / terra</p>
+        <button type="button" class="bright-btn" id="bright" aria-label="Reading brightness">
+    <svg data-level="dim" viewBox="0 0 64 64" aria-hidden="true">
+      <circle cx="32" cy="32" r="22" fill="rgba(154,166,196,0.06)" stroke="none"></circle>
+      <path d="M38 14a16 16 0 1 0 0 32 12 12 0 0 1 0-32z" fill="rgba(200,208,224,0.35)"></path>
+      <line x1="14" y1="54" x2="50" y2="54" opacity="0.5" stroke="#9a7a5c"></line>
+    </svg>
+    <svg data-level="normal" viewBox="0 0 64 64" aria-hidden="true">
+      <circle cx="28" cy="24" r="11" fill="rgba(232,192,112,0.2)" stroke="none"></circle>
+      <circle cx="28" cy="24" r="8" fill="rgba(232,192,112,0.4)" stroke="#d4b07a"></circle>
+      <circle cx="28" cy="24" r="3" fill="#e8c070" stroke="none"></circle>
+      <path fill="#353c46" stroke="#8a929e" stroke-width="1.5" d="M10 46 C10 34 18 28 28 30 C30 20 42 18 48 26 C56 26 58 36 52 42 C56 48 50 52 42 50 H16 C10 50 8 48 10 46Z"></path>
+      <line x1="12" y1="56" x2="52" y2="56" opacity="0.55" stroke="#9a7a5c"></line>
+    </svg>
+    <svg data-level="bright" viewBox="0 0 64 64" aria-hidden="true">
+      <circle cx="32" cy="26" r="20" fill="rgba(232,192,112,0.08)" stroke="none"></circle>
+      <circle cx="32" cy="26" r="8" fill="rgba(232,192,112,0.4)" stroke="#d4b07a"></circle>
+      <circle cx="32" cy="26" r="3.5" fill="#e8c070" stroke="none"></circle>
+      <line x1="10" y1="48" x2="54" y2="48" stroke="#9a7a5c"></line>
+    </svg>
+  </button>
+      </div>
+      <header>
+        <h1>word</h1>
+        <p class="meta">2026-08-18 · terra · egemen</p>
+      </header>
+      <div class="body">
+        <p>It took around two days to design this blog. I had the idea for a <i>Terra</i> and <i>Serra </i>split for a long time but never managed to have it realised until now.</p>
+        <p>The main driver for that split has <i>bloomed</i> from the quite obvious relation between flowers and poetry through the <i>root</i> of the word <i>Anthology</i>. As opposed to <i>Serra </i>where I would build that <i>Anthology</i>; <i>Terra </i>would stand to contain everything that was out of my control. This split would be reflected in the contents as poetcy and prophecy.<br><br>However, while I was building these pages I noticed that this split was missing an element of the earth: the sea. The sea often gives me a sense of belonging I cannot find anywhere else so I wanted to have it have a place here as well. With that, I added <i>Mare</i> to the pot with note that since navigation is a prophecy of what is to come of the horizon it should assume that role and <i>Terra</i> should be reserved for a representation of the freedom bound to flesh in the day to day dealings.</p>
+        <p>In the end I have three legs:</p>
+        <ul>
+          <li>Terra for pondering</li>
+          <li>Serra for poetry</li>
+          <li>Mare for prophecy</li>
+        </ul>
+        <p>which is satisfactory in its own way as "<i>kamuğ üç adaklığ emitmez bolur / üçegü turur tüz kamıtmaz bolur</i>"<sup class="fn"><a href="#fn1" id="fnref1">1</a></sup></p>
+        <p>I am used to playing around with words that connect through roots, rhymes, or vague alliterations to scratch an itch through bringing about a twisted composition that at the end amounts to lame wordplay but starting a design from scratch is always more challenging.<br><br>In poetry, parody is often a great place to start as it lays down some ground to build upon. I would argue that is one of the major reasons "Immature poets imitate; mature poets steal."<sup class="fn"><a href="#fn2" id="fnref2">2</a></sup> I intended to follow suit and looked for inspiration in the works of others. I wanted simplicity so I mostly looked for blogs of retired academics with nothing but simple html pages but I lack their established weight and I realised I cannot do without some form of flair so that did not do it. Luckily, for me, around the beginning of August, I had just come upon the blog of a young researcher who fascinates me and that helped me with the direction of my design, especially in the about page.<sup class="fn"><a href="#fn3" id="fnref3">3</a></sup></p>
+        <p>I tried to pay attention to detail in the design. The sine wave in the about page is supposed to represent the ups and downs, the background stars are a live map of the sky from around Istanbul —which is close enough to the anchor point for me—, and I even designed distinct brightness toggles for the three different blog pages. I am kind of proud of the work I put into this.</p>
+        <h2>Dipnotlar</h2>
+        <ol class="footnotes">
+          <li id="fn1">Arat, Reşid Rahmeti, ed. <em>Kutadgu Bilig: II. Tercüme</em>, beyit 802. Türk Tarih Kurumu Basımevi, 1959. <a class="backref" href="#fnref1">↩</a></li>
+          <li id="fn2">Eliot, T. S. <em>The Sacred Wood: Essays on Poetry and Criticism</em>. 7th ed., Methuen &amp; Co., 1950, p. 125. <a class="backref" href="#fnref2">↩</a></li>
+          <li id="fn3">I wanted to cite the blog but I would like to avoid causing anyone unwanted attention. If you are the owner of the blog, noticed your impact, and would like to be credited, please, do contact me! <a class="backref" href="#fnref3">↩</a></li>
+        </ol>
+      </div>
+      <p class="back"><a href="blog.html">→ blog</a></p>
+    </article>
+  </div>
+  <script src="/entries.js?v=4"></script>
+  <script>
+    (function () {
+      const KEY = "terrazza-bright";
+      const levels = ["dim", "normal", "bright"];
+      const names = { dim: "moon", normal: "overcast", bright: "clear day" };
+      const btn = document.getElementById("bright");
+      function apply(level) {
+        if (level === "normal") document.documentElement.removeAttribute("data-bright");
+        else document.documentElement.setAttribute("data-bright", level);
+        btn.setAttribute("aria-label", "Reading brightness: " + names[level]);
+        btn.title = names[level];
+        try { localStorage.setItem(KEY, level); } catch (_) {}
+      }
+      let level = "normal";
+      try {
+        const saved = localStorage.getItem(KEY);
+        if (saved && levels.indexOf(saved) !== -1) level = saved;
+        else if (window.matchMedia("(prefers-color-scheme: light)").matches) level = "bright";
+      } catch (_) {}
+      apply(level);
+      btn.addEventListener("click", function () {
+        level = levels[(levels.indexOf(level) + 1) % levels.length];
+        apply(level);
+      });
+    })();
+  </script>
+</body>
+</html>
